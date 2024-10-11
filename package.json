@@ -11,6 +11,10 @@
     "server:dev": "node --experimental-strip-types ./src/server/main.ts",
     "test": "node --test --experimental-strip-types --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=lcov.info \"**/*.spec.ts\""
   },
+  "engines": {
+    "node": ">=22.9.0",
+    "npm": ">=10.8.3"
+  },
   "dependencies": {
     "@react-three/fiber": "^8.17.9",
     "@types/three": "^0.169.0",
