@@ -12,7 +12,9 @@ export const useServer = () => {
     if (socketRef.current !== null) {
       return;
     }
-    const socket = new WebSocket("ws://localhost:8080");
+    const socket = new WebSocket(
+      `${location.protocol === "https:" ? "wss" : "ws"}://${location.host === "localhost:5173" ? "localhost:8080" : location.host}`
+    );
 
     socket.onmessage = (event) => {
       console.log(`received: ${event.data}`);
