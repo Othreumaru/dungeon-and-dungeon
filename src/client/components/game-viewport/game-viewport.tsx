@@ -17,11 +17,11 @@ export const GameViewport = () => {
         top: 0,
         left: 0,
       }}
-      camera={{ position: [5, -5, 10], rotation: [Math.PI / 4, 0, 0] }}
+      camera={{ position: [5, 6, 12], rotation: [1.7 * Math.PI, 0, 0] }}
     >
       <ambientLight intensity={Math.PI / 2} />
       <spotLight
-        position={[10, 10, 10]}
+        position={[10, 10, -10]}
         angle={0.15}
         penumbra={1}
         decay={0}

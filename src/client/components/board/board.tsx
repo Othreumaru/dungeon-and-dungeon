@@ -19,7 +19,6 @@ export const Board = ({
   const eventEmitter = useServerContext();
 
   const boxRef = useRef<THREE.Mesh>(null);
-  const mousePointerRef = useRef<THREE.Vector2>(new THREE.Vector2());
   const instancedMeshRef = useRef<THREE.InstancedMesh<
     THREE.BoxGeometry,
     THREE.MeshStandardMaterial
@@ -32,8 +31,8 @@ export const Board = ({
     for (let i = 0; i < count; i++) {
       const row = Math.floor(Math.sqrt(count));
       const col = Math.ceil(count / row);
-      temp.position.set((i % col) + 0.5, Math.floor(i / col) + 0.5, 0);
-      temp.scale.set(0.9, 0.9, 0.1);
+      temp.position.set((i % col) + 0.5, 0, Math.floor(i / col) + 0.5);
+      temp.scale.set(0.9, 0.1, 0.9);
       temp.updateMatrix();
 
       instancedMeshRef.current.setMatrixAt(i, temp.matrix);
@@ -58,13 +57,7 @@ export const Board = ({
       </mesh>
       <mesh
         onPointerMove={(event) => {
-          mousePointerRef.current.x = event.point.x;
-          mousePointerRef.current.y = event.point.y;
-          boxRef.current?.position.set(
-            mousePointerRef.current.x,
-            mousePointerRef.current.y,
-            0.1
-          );
+          boxRef.current?.position.set(event.point.x, 0.1, event.point.z);
         }}
         onPointerUp={(event) => {
           eventEmitter.emit("request", {
@@ -72,11 +65,12 @@ export const Board = ({
             payload: {
               unitId: userId,
               x: Math.floor(event.intersections[0].point.x),
-              y: Math.floor(event.intersections[0].point.y),
+              y: Math.floor(event.intersections[0].point.z),
             },
           } satisfies MoveRequest);
         }}
-        position={[5, 5, 0.1]}
+        position={[5, 0.1, 5]}
+        rotation-x={-Math.PI / 2}
       >
         <planeGeometry args={[10, 10]} />
         <meshStandardMaterial

@@ -3,6 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import { Group } from "three";
 import { Unit as UnitType } from "../../../api";
 import { getUnitPosition } from "../../../engine/selectors";
+import { Mage } from "../mage/mage";
 
 export const Unit = ({ unit }: { unit: UnitType }) => {
   const meshRef = useRef<Group>(null);
@@ -13,15 +14,12 @@ export const Unit = ({ unit }: { unit: UnitType }) => {
     if (!maybePosition) return;
     const { x, y } = maybePosition;
     meshRef.current.position.x = x;
-    meshRef.current.position.y = y;
+    meshRef.current.position.z = y;
   });
 
   return (
     <group ref={meshRef}>
-      <mesh position={[0.5, 0.5, 0.25]} castShadow receiveShadow>
-        <boxGeometry args={[0.5, 0.5, 0.5]} />
-        <meshStandardMaterial color={unit.color} />
-      </mesh>
+      <Mage position={[0.5, 0, 0.25]} scale={[0.5, 0.5, 0.5]} />
     </group>
   );
 };
