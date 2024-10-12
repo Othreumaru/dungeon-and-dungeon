@@ -9,6 +9,7 @@ import type {
   UnitSpawnAction,
 } from "../api.ts";
 import { initialState, reducer } from "./reducer.ts";
+import { aStarSolver } from "../libs/a-star-solver/a-star-solver.ts";
 
 const colors = [
   "blue",
@@ -64,25 +65,22 @@ export const initEngine = (eventEmitter: EventEmitter) => {
           console.warn(`Unit "${data.payload.unitId}" is already moving`);
           return;
         }
-        const distance = Math.sqrt(
-          Math.pow(data.payload.x - unit.x, 2) +
-            Math.pow(data.payload.y - unit.y, 2)
+        const inputGrid: boolean[][] = [...Array(10)].map(() =>
+          [...Array(10)].map(() => true)
+        );
+        const path = aStarSolver(
+          inputGrid,
+          { x: unit.x, y: unit.y },
+          { x: data.payload.x, y: data.payload.y }
         );
         const action: MoveAction = {
           type: "action:move",
           payload: {
-            path: [
-              {
-                x: unit.x,
-                y: unit.y,
-                frame: Date.now(),
-              },
-              {
-                x: data.payload.x,
-                y: data.payload.y,
-                frame: Date.now() + distance * 100,
-              },
-            ],
+            path: path.map((point, index) => ({
+              x: point.x,
+              y: point.y,
+              frame: Date.now() + index * 100,
+            })),
             unitId: data.payload.unitId,
             frame: Date.now(),
           },
@@ -103,8 +101,8 @@ export const initEngine = (eventEmitter: EventEmitter) => {
             unit: {
               id: data.payload.userId,
               type: "stationary",
-              x: Math.floor(Math.random() * 9) - 5,
-              y: Math.floor(Math.random() * 9) - 5,
+              x: Math.floor(Math.random() * 9),
+              y: Math.floor(Math.random() * 9),
               color: colors[Math.floor(Math.random() * colors.length)],
             },
           },

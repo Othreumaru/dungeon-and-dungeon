@@ -32,11 +32,7 @@ export const Board = ({
     for (let i = 0; i < count; i++) {
       const row = Math.floor(Math.sqrt(count));
       const col = Math.ceil(count / row);
-      temp.position.set(
-        (i % col) - col / 2 + 0.5,
-        Math.floor(i / col) - row / 2 + 0.5,
-        0
-      );
+      temp.position.set((i % col) + 0.5, Math.floor(i / col) + 0.5, 0);
       temp.scale.set(0.9, 0.9, 0.1);
       temp.updateMatrix();
 
@@ -47,7 +43,7 @@ export const Board = ({
   }, [count, temp]);
 
   return (
-    <>
+    <group>
       <instancedMesh
         receiveShadow
         ref={instancedMeshRef}
@@ -80,7 +76,7 @@ export const Board = ({
             },
           } satisfies MoveRequest);
         }}
-        position={[0, 0, 0.1]}
+        position={[5, 5, 0.1]}
       >
         <planeGeometry args={[10, 10]} />
         <meshStandardMaterial
@@ -89,6 +85,6 @@ export const Board = ({
           opacity={0.0001}
         />
       </mesh>
-    </>
+    </group>
   );
 };
