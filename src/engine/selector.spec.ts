@@ -8,14 +8,22 @@ describe("getUnitPosition", () => {
     const unit: Unit = {
       id: "1",
       type: "stationary",
-      x: 10,
-      y: 20,
+      position: {
+        x: 10,
+        y: 20,
+      },
+      lookAt: {
+        x: 11,
+        y: 20,
+      },
       color: "blue",
     };
 
     const result = getUnitPosition(unit, 0);
-    deepStrictEqual(result?.x, 10);
-    deepStrictEqual(result?.y, 20);
+    deepStrictEqual(result?.position.x, 10);
+    deepStrictEqual(result?.position.y, 20);
+    deepStrictEqual(result?.lookAt.x, 11);
+    deepStrictEqual(result?.lookAt.y, 20);
   });
 
   it("should return undefined if path is empty", () => {
@@ -43,8 +51,10 @@ describe("getUnitPosition", () => {
       color: "blue",
     };
     const result = getUnitPosition(unit, 50);
-    deepStrictEqual(result?.x, 10);
-    deepStrictEqual(result?.y, 20);
+    deepStrictEqual(result?.position.x, 10);
+    deepStrictEqual(result?.position.y, 20);
+    deepStrictEqual(result?.lookAt.x, 11);
+    deepStrictEqual(result?.lookAt.y, 20);
   });
 
   it("should return last path point if frame is after last frame", () => {
@@ -66,8 +76,10 @@ describe("getUnitPosition", () => {
       color: "blue",
     };
     const result = getUnitPosition(state, 250);
-    deepStrictEqual(result?.x, 20);
-    deepStrictEqual(result?.y, 30);
+    deepStrictEqual(result?.position.x, 20);
+    deepStrictEqual(result?.position.y, 30);
+    deepStrictEqual(result?.lookAt.x, 21);
+    deepStrictEqual(result?.lookAt.y, 31);
   });
 
   it("should interpolate position", () => {
@@ -89,7 +101,9 @@ describe("getUnitPosition", () => {
       color: "blue",
     };
     const result = getUnitPosition(state, 150);
-    deepStrictEqual(result?.x, 15);
-    deepStrictEqual(result?.y, 25);
+    deepStrictEqual(result?.position.x, 15);
+    deepStrictEqual(result?.position.y, 25);
+    deepStrictEqual(result?.lookAt.x, 16);
+    deepStrictEqual(result?.lookAt.y, 26);
   });
 });

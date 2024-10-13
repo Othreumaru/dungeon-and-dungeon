@@ -6,8 +6,14 @@ type BaseUnit = {
 export type Unit =
   | (BaseUnit & {
       type: "stationary";
-      x: number;
-      y: number;
+      position: {
+        x: number;
+        y: number;
+      };
+      lookAt: {
+        x: number;
+        y: number;
+      };
     })
   | (BaseUnit & {
       type: "moving";

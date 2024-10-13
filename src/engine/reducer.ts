@@ -22,7 +22,11 @@ export const reducer = (
                 color: unit.color,
                 type: "moving",
                 path: [
-                  { x: unit.x, y: unit.y, frame: action.payload.frame },
+                  {
+                    x: unit.position.x,
+                    y: unit.position.y,
+                    frame: action.payload.frame,
+                  },
                   ...action.payload.path,
                 ],
               }
@@ -41,8 +45,14 @@ export const reducer = (
                 id: unit.id,
                 color: unit.color,
                 type: "stationary",
-                x: unit.path[unit.path.length - 1].x,
-                y: unit.path[unit.path.length - 1].y,
+                position: {
+                  x: unit.path[unit.path.length - 1].x,
+                  y: unit.path[unit.path.length - 1].y,
+                },
+                lookAt: {
+                  x: unit.path[unit.path.length - 1].x + 1,
+                  y: unit.path[unit.path.length - 1].y,
+                },
               }
             : unit
         ),
