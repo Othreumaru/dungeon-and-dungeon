@@ -15,15 +15,27 @@ describe("reducer", () => {
         {
           id: "1",
           type: "stationary",
-          x: 0,
-          y: 0,
+          position: {
+            x: 0,
+            y: 0,
+          },
+          lookAt: {
+            x: 1,
+            y: 0,
+          },
           color: "blue",
         },
         {
           id: "2",
           type: "stationary",
-          x: 0,
-          y: 0,
+          position: {
+            x: 0,
+            y: 0,
+          },
+          lookAt: {
+            x: 1,
+            y: 0,
+          },
           color: "red",
         },
       ],
@@ -46,7 +58,7 @@ describe("reducer", () => {
 
     const result = [moveAction].reduce(reducer, initialState);
 
-    deepStrictEqual(result, {
+    deepStrictEqual<State>(result, {
       units: [
         {
           id: "1",
@@ -68,8 +80,14 @@ describe("reducer", () => {
         {
           id: "2",
           type: "stationary",
-          x: 0,
-          y: 0,
+          position: {
+            x: 0,
+            y: 0,
+          },
+          lookAt: {
+            x: 1,
+            y: 0,
+          },
           color: "red",
         },
       ],
@@ -84,21 +102,33 @@ describe("reducer", () => {
 
     const result2 = [frameAction].reduce(reducer, result);
 
-    deepStrictEqual(result2, {
+    deepStrictEqual<State>(result2, {
       ...result,
       units: [
         {
           id: "1",
           type: "stationary",
-          x: 10,
-          y: 20,
+          position: {
+            x: 10,
+            y: 20,
+          },
+          lookAt: {
+            x: 11,
+            y: 20,
+          },
           color: "blue",
         },
         {
           id: "2",
           type: "stationary",
-          x: 0,
-          y: 0,
+          position: {
+            x: 0,
+            y: 0,
+          },
+          lookAt: {
+            x: 1,
+            y: 0,
+          },
           color: "red",
         },
       ],
