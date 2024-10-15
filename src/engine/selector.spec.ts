@@ -68,18 +68,18 @@ describe("getUnitPosition", () => {
           frame: 100,
         },
         {
-          x: 20,
-          y: 30,
+          x: 10,
+          y: 21,
           frame: 200,
         },
       ],
       color: "blue",
     };
     const result = getUnitPosition(state, 250);
-    deepStrictEqual(result?.position.x, 20);
-    deepStrictEqual(result?.position.y, 30);
-    deepStrictEqual(result?.lookAt.x, 21);
-    deepStrictEqual(result?.lookAt.y, 31);
+    deepStrictEqual(result?.position.x, 10);
+    deepStrictEqual(result?.position.y, 21);
+    deepStrictEqual(result?.lookAt.x, 10);
+    deepStrictEqual(result?.lookAt.y, 22);
   });
 
   it("should interpolate position", () => {
@@ -103,7 +103,7 @@ describe("getUnitPosition", () => {
     const result = getUnitPosition(state, 150);
     deepStrictEqual(result?.position.x, 15);
     deepStrictEqual(result?.position.y, 25);
-    deepStrictEqual(result?.lookAt.x, 16);
-    deepStrictEqual(result?.lookAt.y, 26);
+    deepStrictEqual(result?.lookAt.x, 20);
+    deepStrictEqual(result?.lookAt.y, 30);
   });
 });

@@ -79,7 +79,7 @@ export const initEngine = (eventEmitter: EventEmitter) => {
             path: path.map((point, index) => ({
               x: point.x,
               y: point.y,
-              frame: Date.now() + index * 100,
+              frame: Date.now() + index * 200,
             })),
             unitId: data.payload.unitId,
             frame: Date.now(),

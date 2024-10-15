@@ -1,4 +1,7 @@
 import type { Unit } from "../api.ts";
+import { NEGATIVE_UNIT_VECTOR_2D } from "../libs/math/vector/const.ts";
+import { vectorMultiplyVector2D } from "../libs/math/vector/multiply.ts";
+import { normalize2D } from "../libs/math/vector/normalize.ts";
 
 export const getUnitPosition = (
   unit: Unit,
@@ -35,10 +38,10 @@ export const getUnitPosition = (
     };
   }
   if (path[path.length - 1].frame < frame) {
-    const lookAtVector = {
+    const lookAtVector = normalize2D({
       x: path[path.length - 1].x - path[path.length - 2].x,
       y: path[path.length - 1].y - path[path.length - 2].y,
-    };
+    });
     const lastFrame = {
       position: path[path.length - 1],
       lookAt: {
@@ -46,7 +49,6 @@ export const getUnitPosition = (
         y: path[path.length - 1].y + lookAtVector.y,
       },
     };
-    console.log(lastFrame);
     return lastFrame;
   }
   for (let i = 0; i < path.length - 1; i++) {
