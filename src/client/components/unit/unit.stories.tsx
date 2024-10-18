@@ -22,9 +22,24 @@ const Template = () => (
     <Unit
       unit={{
         id: "1",
-        type: "stationary",
-        x: 0,
-        y: 0,
+        type: "moving",
+        path: [
+          {
+            x: 0,
+            y: 0,
+            frame: 100,
+          },
+          {
+            x: 1,
+            y: 0,
+            frame: 200,
+          },
+          {
+            x: 1,
+            y: 1,
+            frame: 300,
+          },
+        ],
         color: "blue",
       }}
     />
