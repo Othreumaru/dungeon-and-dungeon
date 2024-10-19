@@ -34,7 +34,6 @@ export const Unit = ({ unit, now }: { unit: UnitType; now: number }) => {
           nextPoint
         );
       });
-      console.log(curves);
       return curves;
     } else {
       return [];
