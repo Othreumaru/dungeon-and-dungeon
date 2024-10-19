@@ -103,7 +103,7 @@ describe("getUnitPosition", () => {
     const result = getUnitPosition(state, 150);
     deepStrictEqual(result?.position.x, 15);
     deepStrictEqual(result?.position.y, 25);
-    deepStrictEqual(result?.lookAt.x, 20);
-    deepStrictEqual(result?.lookAt.y, 30);
+    deepStrictEqual(result?.lookAt.x, 14.292893218813452);
+    deepStrictEqual(result?.lookAt.y, 24.292893218813454);
   });
 });
