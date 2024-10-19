@@ -30,7 +30,7 @@ export const GameViewport = () => {
       />
       <pointLight position={[-10, -10, -10]} decay={0} intensity={Math.PI} />
       {state.units.map((unit) => (
-        <Unit key={unit.id} unit={unit} />
+        <Unit now={Date.now()} key={unit.id} unit={unit} />
       ))}
       <Board />
     </Canvas>

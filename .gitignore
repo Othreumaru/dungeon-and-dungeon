@@ -26,3 +26,4 @@ lcov.info
 *.sw?
 *.tsbuildinfo
 *storybook.log
+storybook-static

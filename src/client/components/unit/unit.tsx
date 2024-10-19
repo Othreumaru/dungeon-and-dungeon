@@ -1,54 +1,107 @@
-import { useRef } from "react";
-import { useFrame } from "@react-three/fiber";
-import { Group, Mesh, Vector3 } from "three";
+import { useMemo, useRef } from "react";
+import { CubicBezierCurve3, Euler, Group, Object3D, Vector3 } from "three";
 import { Unit as UnitType } from "../../../api";
-import { getUnitPosition } from "../../../engine/selectors";
 import { Mage } from "../mage/mage";
-import { Line } from "@react-three/drei";
+import { Box, MotionPathControls } from "@react-three/drei";
+import { clamp } from "../../../libs/math/clamp";
+// import { getUnitPosition } from "../../../engine/selectors";
+// import { useFrame } from "@react-three/fiber";
 
-export const Unit = ({ unit }: { unit: UnitType }) => {
-  const meshRef = useRef<Group>(null);
-  const lookAtRef = useRef<Mesh>(null);
+const MAGE_SCALE: Vector3 = new Vector3(0.5, 0.5, 0.5);
+const MAGE_POSITION: Vector3 = new Vector3(0, -0.1, 0);
+const MAGE_ROTATION: Euler = new Euler(0, 0, 0);
 
-  useFrame(() => {
-    if (!meshRef.current) return;
-    const maybePosition = getUnitPosition(unit, Date.now());
-    if (!maybePosition) return;
-    meshRef.current.position.x = maybePosition.position.x + 1;
-    meshRef.current.position.z = maybePosition.position.y + 1;
-    meshRef.current.position.y = -0.5;
-    meshRef.current.lookAt(
-      maybePosition.lookAt.x,
-      -0.5,
-      maybePosition.lookAt.y
-    );
-    if (!lookAtRef.current) return;
-    lookAtRef.current.position.x = maybePosition.lookAt.x + 0.5;
-    lookAtRef.current.position.y = 0.5;
-    lookAtRef.current.position.z = maybePosition.lookAt.y + 0.5;
-  });
+const clamp0To100 = clamp(0, 100);
 
-  const points = unit.type === "moving" ? unit.path : [];
-  console.log(points);
+export const Unit = ({ unit, now }: { unit: UnitType; now: number }) => {
+  const unitRef = useRef<Group>(null);
+  const targetRef = useRef<Group>(null);
+
+  const curves = useMemo(() => {
+    if (unit.type === "moving") {
+      const curves = unit.path.slice(0, -1).map((point, index) => {
+        const currentPoint = new Vector3(point.x, 0, point.y);
+        const nextPoint = new Vector3(
+          unit.path[index + 1]?.x ?? point.x,
+          0,
+          unit.path[index + 1]?.y ?? point.y
+        );
+
+        return new CubicBezierCurve3(
+          currentPoint,
+          currentPoint,
+          nextPoint,
+          nextPoint
+        );
+      });
+      console.log(curves);
+      return curves;
+    } else {
+      return [];
+    }
+  }, [unit]);
+
+  const pointAhead = useMemo<[number, number, number]>(() => {
+    if (curves.length) {
+      const timeAhead = now + 5;
+      const t = clamp0To100(timeAhead) / 100;
+
+      const nowIndex = Math.floor(t * curves.length);
+      if (nowIndex < 0) {
+        const p = curves[0].getPoint(0);
+        return [p.x, p.y, p.z];
+      }
+      if (nowIndex >= curves.length) {
+        // extrapolate
+        const p1 = curves[curves.length - 1].getPoint(0.5);
+        const p2 = curves[curves.length - 1].getPoint(1);
+
+        const dx = p2.x - p1.x;
+        const dy = p2.y - p1.y;
+        const dz = p2.z - p1.z;
+
+        const p = curves[curves.length - 1]
+          .getPoint(1)
+          .add(new Vector3(dx, dy, dz));
+        return [p.x, p.y, p.z];
+      }
+
+      const frac = 1 / curves.length;
+      const x1 = frac * nowIndex;
+      const x2 = frac * (nowIndex + 1);
+
+      const ratio = (t - x1) / (x2 - x1);
+
+      const p = curves[nowIndex].getPoint(ratio);
+      return [p.x, p.y, p.z];
+    }
+    return [0, 0, 0];
+  }, [curves, now]);
 
   return (
     <group>
-      <group ref={meshRef} position={[0, 0, 0]}>
+      <group ref={unitRef}>
         <Mage
-          rotation={[0, -Math.PI / 2, 0]}
-          position={[0.5, 0.5, 0.5]}
-          scale={[0.5, 0.5, 0.5]}
+          position={MAGE_POSITION}
+          scale={MAGE_SCALE}
+          rotation={MAGE_ROTATION}
         />
       </group>
-      <mesh position={[0.5, 0, 0.25]} ref={lookAtRef}>
-        <boxGeometry args={[0.2, 0.2, 0.2]} />
-        <meshStandardMaterial color={"red"} />
-      </mesh>
-      <Line
-        points={points.map((point) => new Vector3(point.x, 0.5, point.y))}
-        linewidth={1}
-        color="white"
-      />
+      {curves.length && (
+        <MotionPathControls
+          debug={true}
+          smooth={false}
+          damping={0}
+          focus={pointAhead}
+          offset={clamp0To100(now) / 100}
+          object={unitRef as React.MutableRefObject<Object3D>}
+          curves={curves}
+        />
+      )}
+
+      <Box args={[0.2, 0.2, 0.2]} position={[0, 0, 0]} material-color={"red"} />
+
+      <object3D position={[0.5, 0, 0.5]} ref={targetRef} />
     </group>
   );
 };

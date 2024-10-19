@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { GLTF } from "three-stdlib";
 
 import { useAnimations, useGLTF } from "@react-three/drei";
@@ -150,7 +150,7 @@ interface AnimationClip extends THREE.AnimationClip {
 
 export const MageGLBPath = "/Mage.glb";
 
-export function Mage({
+function MageComponent({
   bookOpen = false,
   weapon = "staff",
   animation = "Idle",
@@ -162,6 +162,7 @@ export function Mage({
   animation?: ActionName;
   animationReversed?: boolean;
 }) {
+  console.log("Mage render");
   const group = useRef<THREE.Group>(null);
   const { nodes, materials, animations } = useGLTF("/Mage.glb") as GLTFResult;
   const { actions } = useAnimations<AnimationClip>(
@@ -580,3 +581,5 @@ export function Mage({
 }
 
 useGLTF.preload("/Mage.glb");
+
+export const Mage = memo(MageComponent);
