@@ -70,7 +70,7 @@ export const initEngine = (eventEmitter: EventEmitter) => {
         );
         const path = aStarSolver(
           inputGrid,
-          { x: unit.x, y: unit.y },
+          { x: unit.position.x, y: unit.position.y },
           { x: data.payload.x, y: data.payload.y }
         );
         const action: MoveAction = {
@@ -79,7 +79,7 @@ export const initEngine = (eventEmitter: EventEmitter) => {
             path: path.map((point, index) => ({
               x: point.x,
               y: point.y,
-              frame: Date.now() + index * 100,
+              frame: Date.now() + index * 200,
             })),
             unitId: data.payload.unitId,
             frame: Date.now(),
@@ -95,14 +95,18 @@ export const initEngine = (eventEmitter: EventEmitter) => {
             state,
           },
         };
+        const randomPosition = {
+          x: Math.floor(Math.random() * 9),
+          y: Math.floor(Math.random() * 9),
+        };
         const spawnAction: UnitSpawnAction = {
           type: "action:unit-spawn",
           payload: {
             unit: {
               id: data.payload.userId,
               type: "stationary",
-              x: Math.floor(Math.random() * 9),
-              y: Math.floor(Math.random() * 9),
+              position: randomPosition,
+              lookAt: { x: randomPosition.x, y: randomPosition.y - 1 },
               color: colors[Math.floor(Math.random() * colors.length)],
             },
           },

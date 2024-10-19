@@ -1,7 +1,13 @@
 import * as React from "react";
 import { Vector3 } from "three";
 import { Canvas, Props as CanvasProps } from "@react-three/fiber";
-import { Environment, Grid, OrbitControls } from "@react-three/drei";
+import {
+  Environment,
+  Grid,
+  OrbitControls,
+  Sky,
+  TransformControls,
+} from "@react-three/drei";
 
 type Props = React.PropsWithChildren<
   CanvasProps & {
@@ -26,7 +32,11 @@ export const DemoScene = ({
       camera={{ position: cameraPosition, fov: cameraFov }}
       {...restProps}
     >
-      {children}
+      {children && (
+        <TransformControls enabled={false} mode="translate">
+          <group>{children}</group>
+        </TransformControls>
+      )}
 
       {lights && (
         <>
@@ -55,6 +65,7 @@ export const DemoScene = ({
         <planeGeometry args={[100, 100]} />
         <meshStandardMaterial color="gray" />
       </mesh>
+      <Sky sunPosition={[100, 10, 100]} />
       <Environment preset="city" />
     </Canvas>
   </div>

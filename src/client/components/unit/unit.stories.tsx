@@ -15,16 +15,52 @@ export default {
       </DemoScene>
     ),
   ],
+  argTypes: {
+    now: {
+      control: {
+        type: "number",
+      },
+      defaultValue: 0,
+      min: 0,
+      max: 100,
+    },
+  },
 };
 
-const Template = () => (
+const Template = ({ now }: { now: number }) => (
   <>
     <Unit
+      now={now}
       unit={{
         id: "1",
-        type: "stationary",
-        x: 0,
-        y: 0,
+        type: "moving",
+        path: [
+          {
+            x: 0,
+            y: 0,
+            frame: 100,
+          },
+          {
+            x: 1,
+            y: 0,
+            frame: 200,
+          },
+          {
+            x: 1,
+            y: 1,
+            frame: 300,
+          },
+          {
+            x: 0,
+            y: 1,
+            frame: 400,
+          },
+          {
+            x: 0,
+            y: 0,
+            frame: 500,
+          },
+        ],
         color: "blue",
       }}
     />
