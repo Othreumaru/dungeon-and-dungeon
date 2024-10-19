@@ -148,7 +148,7 @@ interface AnimationClip extends THREE.AnimationClip {
   name: ActionName;
 }
 
-export const MageGLBPath = "./Mage.glb";
+const MageGLBPath = "./Mage.glb";
 
 function MageComponent({
   bookOpen = false,
@@ -164,7 +164,7 @@ function MageComponent({
 }) {
   console.log("Mage render");
   const group = useRef<THREE.Group>(null);
-  const { nodes, materials, animations } = useGLTF("/Mage.glb") as GLTFResult;
+  const { nodes, materials, animations } = useGLTF(MageGLBPath) as GLTFResult;
   const { actions } = useAnimations<AnimationClip>(
     animations as AnimationClip[],
     group
@@ -580,6 +580,6 @@ function MageComponent({
   );
 }
 
-useGLTF.preload("./Mage.glb");
+useGLTF.preload(MageGLBPath);
 
 export const Mage = memo(MageComponent);
