@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { MovingUnit, StationaryUnit, Unit as UnitType } from "../../../api";
-import { Mage } from "../mage/mage";
+import { Mage, MageApi } from "../mage/mage";
 import { useFrame } from "@react-three/fiber";
 import { easing } from "maath";
 import {
@@ -94,15 +94,20 @@ const MovingComponent = ({
   unit,
   unitRef,
   audioRef,
+  unitApiRef,
 }: {
   unit: MovingUnit;
   unitRef: React.MutableRefObject<THREE.Object3D>;
   audioRef: React.MutableRefObject<THREE.PositionalAudio>;
+  unitApiRef: React.MutableRefObject<MageApi>;
 }) => {
   useEffect(() => {
     const currentAudioRef = audioRef.current;
+    const currentUnitApiRef = unitApiRef.current;
     currentAudioRef.play();
+    currentUnitApiRef.playAnimation("Running_A");
     return () => {
+      currentUnitApiRef.playAnimation("Idle");
       currentAudioRef.stop();
     };
   });
@@ -157,6 +162,7 @@ const MovingComponent = ({
 export const Unit = ({ unit }: { unit: UnitType; now?: number }) => {
   const unitRef = useRef<THREE.Group>(null);
   const audioRef = useRef<THREE.PositionalAudio>(null);
+  const unitApiRef = useRef<MageApi>(null);
 
   useEffect(() => {
     audioRef.current?.setVolume(0.1);
@@ -168,6 +174,7 @@ export const Unit = ({ unit }: { unit: UnitType; now?: number }) => {
     <group>
       <group ref={unitRef}>
         <Mage
+          ref={unitApiRef}
           position={MAGE_POSITION}
           scale={MAGE_SCALE}
           rotation={MAGE_ROTATION}
@@ -183,6 +190,7 @@ export const Unit = ({ unit }: { unit: UnitType; now?: number }) => {
         <MovingComponent
           unitRef={unitRef as React.MutableRefObject<THREE.Object3D>}
           audioRef={audioRef as React.MutableRefObject<THREE.PositionalAudio>}
+          unitApiRef={unitApiRef as React.MutableRefObject<MageApi>}
           unit={unit}
         />
       )}

@@ -1,5 +1,14 @@
 import * as THREE from "three";
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import {
+  forwardRef,
+  ForwardRefRenderFunction,
+  memo,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import { GLTF } from "three-stdlib";
 
 import { useAnimations, useGLTF } from "@react-three/drei";
@@ -150,19 +159,30 @@ interface AnimationClip extends THREE.AnimationClip {
 
 export const MageGLBPath = "./Mage.glb";
 
-function MageComponent({
-  bookOpen = false,
-  weapon = "staff",
-  animation = "Idle",
-  animationReversed = false,
-  ...restProps
-}: JSX.IntrinsicElements["group"] & {
-  bookOpen?: boolean;
-  weapon?: "staff" | "wand";
-  animation?: ActionName;
-  animationReversed?: boolean;
-}) {
+export type MageApi = {
+  playAnimation: (name: ActionName) => void;
+};
+
+const MageComponent: ForwardRefRenderFunction<
+  MageApi,
+  JSX.IntrinsicElements["group"] & {
+    bookOpen?: boolean;
+    weapon?: "staff" | "wand";
+    animation?: ActionName;
+    animationReversed?: boolean;
+  }
+> = (
+  {
+    bookOpen = false,
+    weapon = "staff",
+    animation = "Idle",
+    animationReversed = false,
+    ...restProps
+  },
+  fref
+) => {
   console.log("Mage render");
+  const prevAnimation = useRef<ActionName | null>(null);
   const group = useRef<THREE.Group>(null);
   const { nodes, materials, animations } = useGLTF("/Mage.glb") as GLTFResult;
   const { actions } = useAnimations<AnimationClip>(
@@ -213,6 +233,20 @@ function MageComponent({
       actions[animation]?.stop();
     };
   }, [animation, actions, animationReversed]);
+
+  useImperativeHandle(fref, () => {
+    return {
+      playAnimation: (name: ActionName) => {
+        if (prevAnimation.current !== null) {
+          actions[prevAnimation.current]?.stop();
+        }
+        if (actions[name]) {
+          actions[name].play();
+          prevAnimation.current = name;
+        }
+      },
+    };
+  }, [actions]);
 
   return (
     <group ref={group} {...restProps} dispose={null}>
@@ -578,8 +612,10 @@ function MageComponent({
       </group>
     </group>
   );
-}
+};
 
 useGLTF.preload("./Mage.glb");
 
-export const Mage = memo(MageComponent);
+const ForwardedMageComponent = forwardRef(MageComponent);
+
+export const Mage = memo(ForwardedMageComponent);
