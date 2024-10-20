@@ -32,6 +32,8 @@ describe("getUnitPosition", () => {
       type: "moving",
       path: [],
       color: "blue",
+      startFrame: 100,
+      endFrame: 200,
     };
     const result = getUnitPosition(unit, 0);
     deepStrictEqual(result, undefined);
@@ -45,9 +47,10 @@ describe("getUnitPosition", () => {
         {
           x: 10,
           y: 20,
-          frame: 100,
         },
       ],
+      startFrame: 100,
+      endFrame: 200,
       color: "blue",
     };
     const result = getUnitPosition(unit, 50);
@@ -65,14 +68,14 @@ describe("getUnitPosition", () => {
         {
           x: 10,
           y: 20,
-          frame: 100,
         },
         {
           x: 10,
           y: 21,
-          frame: 200,
         },
       ],
+      startFrame: 100,
+      endFrame: 200,
       color: "blue",
     };
     const result = getUnitPosition(state, 250);
@@ -90,14 +93,14 @@ describe("getUnitPosition", () => {
         {
           x: 10,
           y: 20,
-          frame: 100,
         },
         {
           x: 20,
           y: 30,
-          frame: 200,
         },
       ],
+      startFrame: 100,
+      endFrame: 200,
       color: "blue",
     };
     const result = getUnitPosition(state, 150);

@@ -45,14 +45,14 @@ describe("reducer", () => {
       type: "action:move",
       payload: {
         unitId: "1",
-        frame: 100,
         path: [
           {
             x: 10,
             y: 20,
-            frame: 200,
           },
         ],
+        startFrame: 100,
+        endFrame: 200,
       },
     };
 
@@ -67,14 +67,14 @@ describe("reducer", () => {
             {
               x: 0,
               y: 0,
-              frame: 100,
             },
             {
               x: 10,
               y: 20,
-              frame: 200,
             },
           ],
+          startFrame: 100,
+          endFrame: 200,
           color: "blue",
         },
         {

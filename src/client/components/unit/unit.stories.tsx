@@ -77,31 +77,28 @@ Sample1.args = {
   unit: {
     id: "1",
     type: "moving",
+    startFrame: 0,
+    endFrame: 500,
     path: [
       {
         x: 0,
         y: 0,
-        frame: 100,
       },
       {
         x: 1,
         y: 0,
-        frame: 200,
       },
       {
         x: 1,
         y: 1,
-        frame: 300,
       },
       {
         x: 0,
         y: 1,
-        frame: 400,
       },
       {
         x: 0,
         y: 0,
-        frame: 500,
       },
     ],
     color: "blue",

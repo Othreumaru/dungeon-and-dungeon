@@ -1,81 +1,168 @@
-import { useMemo, useRef } from "react";
-import { CubicBezierCurve3, Euler, Group, Object3D, Vector3 } from "three";
-import { Unit as UnitType } from "../../../api";
+import { useEffect, useMemo, useRef } from "react";
+import * as THREE from "three";
+import { MovingUnit, StationaryUnit, Unit as UnitType } from "../../../api";
 import { Mage } from "../mage/mage";
-import { Box, MotionPathControls } from "@react-three/drei";
-import { clamp } from "../../../libs/math/clamp";
-// import { getUnitPosition } from "../../../engine/selectors";
-// import { useFrame } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
+import { easing } from "maath";
+import {
+  MotionPathControls,
+  useMotion,
+} from "../motion-path-controls/motion-path-controls";
+import { PositionalAudio } from "@react-three/drei";
 
-const MAGE_SCALE: Vector3 = new Vector3(0.5, 0.5, 0.5);
-const MAGE_POSITION: Vector3 = new Vector3(0, -0.1, 0);
-const MAGE_ROTATION: Euler = new Euler(0, 0, 0);
+const MAGE_SCALE: THREE.Vector3 = new THREE.Vector3(0.5, 0.5, 0.5);
+const MAGE_POSITION: THREE.Vector3 = new THREE.Vector3(0, -0.1, 0);
+const MAGE_ROTATION: THREE.Euler = new THREE.Euler(0, 0, 0);
 
-const clamp0To100 = clamp(0, 100);
+const MAX_MOTION_VALUE = 0.99999999;
 
-export const Unit = ({ unit, now }: { unit: UnitType; now: number }) => {
-  const unitRef = useRef<Group>(null);
-  const targetRef = useRef<Group>(null);
+function clamp(value: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, value));
+}
+
+const focusDamping = 0.1;
+const maxSpeed = Infinity;
+const eps = 0.00001;
+
+export const Loop = ({
+  startFrame,
+  endFrame,
+}: {
+  startFrame: number;
+  endFrame: number;
+}) => {
+  const motion = useMotion();
+  useFrame((_, delta) => {
+    const now = Date.now();
+    if (now < startFrame) {
+      motion.current = 0;
+    } else if (now > endFrame) {
+      motion.current = MAX_MOTION_VALUE;
+      return;
+    } else {
+      // Set the current position along the curve, you can increment indiscriminately for a loop
+      motion.current = clamp(
+        (now - startFrame) / (endFrame - startFrame),
+        0,
+        1
+      );
+      // Look ahead on the curve
+      const vec = motion.next.clone().sub(motion.point).normalize();
+      const lookAtVec = motion.point
+        .clone()
+        .add(new THREE.Vector3(0.5, 0, 0.5))
+        .add(vec);
+
+      easing.dampLookAt(
+        motion.object.current,
+        lookAtVec,
+        focusDamping,
+        delta,
+        maxSpeed,
+        undefined,
+        eps
+      );
+    }
+  });
+  return null;
+};
+
+const StationaryComponent = ({
+  unit,
+  unitRef,
+}: {
+  unit: StationaryUnit;
+  unitRef: React.MutableRefObject<THREE.Object3D>;
+}) => {
+  useFrame((_, delta) => {
+    unitRef.current.position.set(unit.position.x, 0, unit.position.y);
+    easing.dampLookAt(
+      unitRef.current,
+      new THREE.Vector3(unit.lookAt.x, 0, unit.lookAt.y),
+      focusDamping,
+      delta,
+      maxSpeed,
+      undefined,
+      eps
+    );
+    // unitRef.current.lookAt(new Vector3(unit.lookAt.x, 0, unit.lookAt.y));
+  });
+  return null;
+};
+
+const MovingComponent = ({
+  unit,
+  unitRef,
+  audioRef,
+}: {
+  unit: MovingUnit;
+  unitRef: React.MutableRefObject<THREE.Object3D>;
+  audioRef: React.MutableRefObject<THREE.PositionalAudio>;
+}) => {
+  useEffect(() => {
+    const currentAudioRef = audioRef.current;
+    currentAudioRef.play();
+    return () => {
+      currentAudioRef.stop();
+    };
+  });
 
   const curves = useMemo(() => {
-    if (unit.type === "moving") {
-      const curves = unit.path.slice(0, -1).map((point, index) => {
-        const currentPoint = new Vector3(point.x, 0, point.y);
-        const nextPoint = new Vector3(
-          unit.path[index + 1]?.x ?? point.x,
-          0,
-          unit.path[index + 1]?.y ?? point.y
-        );
+    const curves = unit.path.slice(0, -1).map((point, index) => {
+      const currentPoint = new THREE.Vector3(point.x, 0, point.y);
+      const nextPoint = new THREE.Vector3(
+        unit.path[index + 1]?.x ?? point.x,
+        0,
+        unit.path[index + 1]?.y ?? point.y
+      );
 
-        return new CubicBezierCurve3(
-          currentPoint,
-          currentPoint,
-          nextPoint,
-          nextPoint
-        );
-      });
-      return curves;
-    } else {
-      return [];
-    }
+      return new THREE.CubicBezierCurve3(
+        currentPoint,
+        currentPoint,
+        nextPoint,
+        nextPoint
+      );
+    });
+    return curves;
   }, [unit]);
 
-  const pointAhead = useMemo<[number, number, number]>(() => {
-    if (curves.length) {
-      const timeAhead = now + 5;
-      const t = clamp0To100(timeAhead) / 100;
-
-      const nowIndex = Math.floor(t * curves.length);
-      if (nowIndex < 0) {
-        const p = curves[0].getPoint(0);
-        return [p.x, p.y, p.z];
+  useEffect(() => {
+    const currentUnitRef = unitRef.current;
+    return () => {
+      if (!currentUnitRef) {
+        return;
       }
-      if (nowIndex >= curves.length) {
-        // extrapolate
-        const p1 = curves[curves.length - 1].getPoint(0.5);
-        const p2 = curves[curves.length - 1].getPoint(1);
+      currentUnitRef.position.set(
+        unit.path[unit.path.length - 1].x,
+        0,
+        unit.path[unit.path.length - 1].y
+      );
+    };
+  }, [unit, unitRef]);
 
-        const dx = p2.x - p1.x;
-        const dy = p2.y - p1.y;
-        const dz = p2.z - p1.z;
+  return (
+    <MotionPathControls
+      debug={true}
+      smooth={false}
+      damping={0}
+      object={unitRef as React.MutableRefObject<THREE.Object3D>}
+      curves={curves}
+      position={[0, 0.2, 0]}
+    >
+      <Loop startFrame={unit.startFrame} endFrame={unit.endFrame} />
+    </MotionPathControls>
+  );
+};
 
-        const p = curves[curves.length - 1]
-          .getPoint(1)
-          .add(new Vector3(dx, dy, dz));
-        return [p.x, p.y, p.z];
-      }
+export const Unit = ({ unit }: { unit: UnitType; now?: number }) => {
+  const unitRef = useRef<THREE.Group>(null);
+  const audioRef = useRef<THREE.PositionalAudio>(null);
 
-      const frac = 1 / curves.length;
-      const x1 = frac * nowIndex;
-      const x2 = frac * (nowIndex + 1);
+  useEffect(() => {
+    audioRef.current?.setVolume(0.1);
+  }, []);
 
-      const ratio = (t - x1) / (x2 - x1);
-
-      const p = curves[nowIndex].getPoint(ratio);
-      return [p.x, p.y, p.z];
-    }
-    return [0, 0, 0];
-  }, [curves, now]);
+  console.log("unit render");
 
   return (
     <group>
@@ -85,22 +172,26 @@ export const Unit = ({ unit, now }: { unit: UnitType; now: number }) => {
           scale={MAGE_SCALE}
           rotation={MAGE_ROTATION}
         />
+        <PositionalAudio
+          ref={audioRef}
+          url="./Steps_tiles-010.ogg"
+          distance={1}
+          loop={true}
+        />
       </group>
-      {curves.length && (
-        <MotionPathControls
-          debug={true}
-          smooth={false}
-          damping={0}
-          focus={pointAhead}
-          offset={clamp0To100(now) / 100}
-          object={unitRef as React.MutableRefObject<Object3D>}
-          curves={curves}
+      {unit.type === "moving" && (
+        <MovingComponent
+          unitRef={unitRef as React.MutableRefObject<THREE.Object3D>}
+          audioRef={audioRef as React.MutableRefObject<THREE.PositionalAudio>}
+          unit={unit}
         />
       )}
-
-      <Box args={[0.2, 0.2, 0.2]} position={[0, 0, 0]} material-color={"red"} />
-
-      <object3D position={[0.5, 0, 0.5]} ref={targetRef} />
+      {unit.type === "stationary" && (
+        <StationaryComponent
+          unitRef={unitRef as React.MutableRefObject<THREE.Object3D>}
+          unit={unit}
+        />
+      )}
     </group>
   );
 };

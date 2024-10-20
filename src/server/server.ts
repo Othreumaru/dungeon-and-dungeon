@@ -2,12 +2,15 @@ import EventEmitter from "eventemitter3";
 import WebSocket, { WebSocketServer } from "ws";
 import type { LeaveRequest, Requests } from "../api.ts";
 import express from "express";
+// import ViteExpress from "vite-express";
 
 export const initServer = (eventEmitter: EventEmitter) => {
   const app = express();
   app.use(express.static("dist"));
 
-  const server = app.listen(8080);
+  const server = app.listen(8080, () => {
+    console.log("Server is listening...");
+  });
 
   const wss = new WebSocketServer({ server });
 
@@ -55,6 +58,8 @@ export const initServer = (eventEmitter: EventEmitter) => {
       eventEmitter.removeAllListeners(`message:${leaveRequest.payload.userId}`);
     });
   });
+
+  // ViteExpress.bind(app, server);
 
   return wss;
 };

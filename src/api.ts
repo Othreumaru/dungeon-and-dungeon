@@ -3,22 +3,26 @@ type BaseUnit = {
   color: string;
 };
 
-export type Unit =
-  | (BaseUnit & {
-      type: "stationary";
-      position: {
-        x: number;
-        y: number;
-      };
-      lookAt: {
-        x: number;
-        y: number;
-      };
-    })
-  | (BaseUnit & {
-      type: "moving";
-      path: { frame: number; x: number; y: number }[];
-    });
+export type StationaryUnit = BaseUnit & {
+  type: "stationary";
+  position: {
+    x: number;
+    y: number;
+  };
+  lookAt: {
+    x: number;
+    y: number;
+  };
+};
+
+export type MovingUnit = BaseUnit & {
+  type: "moving";
+  startFrame: number;
+  endFrame: number;
+  path: { x: number; y: number }[];
+};
+
+export type Unit = StationaryUnit | MovingUnit;
 
 export type State = {
   units: Unit[];
@@ -67,8 +71,9 @@ export type MoveAction = {
   type: "action:move";
   payload: {
     unitId: string;
-    frame: number;
-    path: { frame: number; x: number; y: number }[];
+    startFrame: number;
+    endFrame: number;
+    path: { x: number; y: number }[];
   };
 };
 

@@ -76,13 +76,13 @@ export const initEngine = (eventEmitter: EventEmitter) => {
         const action: MoveAction = {
           type: "action:move",
           payload: {
-            path: path.map((point, index) => ({
+            path: path.map((point) => ({
               x: point.x,
               y: point.y,
-              frame: Date.now() + index * 200,
             })),
             unitId: data.payload.unitId,
-            frame: Date.now(),
+            startFrame: Date.now(),
+            endFrame: Date.now() + path.length * 200,
           },
         };
         eventEmitter.emit("broadcast", action);
