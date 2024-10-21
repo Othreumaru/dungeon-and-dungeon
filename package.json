@@ -8,8 +8,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "server:dev": "node --experimental-strip-types ./src/server/main.ts",
-    "server:prod": "NODE_ENV=production node --experimental-strip-types ./src/server/main.ts",
+    "server:dev": "node --env-file=.env --experimental-strip-types ./src/server/main.ts",
+    "server:prod": "NODE_ENV=production node --env-file=.env --experimental-strip-types ./src/server/main.ts",
     "test": "node --test --experimental-strip-types  \"**/*.spec.ts\"",
     "test:coverage": "node --test --experimental-strip-types --experimental-test-coverage  \"**/*.spec.ts\"",
     "test:coverage:report": "node --test --experimental-strip-types --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=lcov.info \"**/*.spec.ts\"",
@@ -21,6 +21,7 @@
     "npm": ">=10.8.3"
   },
   "dependencies": {
+    "@auth/express": "^0.8.2",
     "@react-three/drei": "^9.114.3",
     "@react-three/fiber": "^8.17.9",
     "@types/three": "^0.169.0",

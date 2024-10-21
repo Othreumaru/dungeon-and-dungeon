@@ -2,11 +2,15 @@ import EventEmitter from "eventemitter3";
 import WebSocket, { WebSocketServer } from "ws";
 import type { LeaveRequest, Requests } from "../api.ts";
 import express from "express";
+import { ExpressAuth } from "@auth/express";
+import GitHub from "@auth/express/providers/github";
 // import ViteExpress from "vite-express";
 
 export const initServer = (eventEmitter: EventEmitter) => {
   const app = express();
+  app.set("trust proxy", true);
   app.use(express.static("dist"));
+  app.use("/auth/*", ExpressAuth({ providers: [GitHub] }));
 
   const server = app.listen(8080, () => {
     console.log("Server is listening...");
