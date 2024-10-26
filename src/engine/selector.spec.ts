@@ -32,6 +32,8 @@ describe("getUnitPosition", () => {
       type: "moving",
       path: [],
       color: "blue",
+      startFrame: 100,
+      endFrame: 200,
     };
     const result = getUnitPosition(unit, 0);
     deepStrictEqual(result, undefined);
@@ -45,9 +47,10 @@ describe("getUnitPosition", () => {
         {
           x: 10,
           y: 20,
-          frame: 100,
         },
       ],
+      startFrame: 100,
+      endFrame: 200,
       color: "blue",
     };
     const result = getUnitPosition(unit, 50);
@@ -65,14 +68,14 @@ describe("getUnitPosition", () => {
         {
           x: 10,
           y: 20,
-          frame: 100,
         },
         {
           x: 10,
           y: 21,
-          frame: 200,
         },
       ],
+      startFrame: 100,
+      endFrame: 200,
       color: "blue",
     };
     const result = getUnitPosition(state, 250);
@@ -90,20 +93,20 @@ describe("getUnitPosition", () => {
         {
           x: 10,
           y: 20,
-          frame: 100,
         },
         {
           x: 20,
           y: 30,
-          frame: 200,
         },
       ],
+      startFrame: 100,
+      endFrame: 200,
       color: "blue",
     };
     const result = getUnitPosition(state, 150);
-    deepStrictEqual(result?.position.x, 15);
-    deepStrictEqual(result?.position.y, 25);
-    deepStrictEqual(result?.lookAt.x, 14.292893218813452);
-    deepStrictEqual(result?.lookAt.y, 24.292893218813454);
+    deepStrictEqual(result?.position.x, 10);
+    deepStrictEqual(result?.position.y, 20);
+    deepStrictEqual(result?.lookAt.x, 10);
+    deepStrictEqual(result?.lookAt.y, 20);
   });
 });

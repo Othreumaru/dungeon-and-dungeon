@@ -7,6 +7,8 @@ import { EngineContext } from "../../engine-context";
 export const GameViewport = () => {
   const state = useContext(EngineContext);
 
+  console.log("rendering game viewport");
+
   return (
     <Canvas
       shadows={true}
@@ -29,9 +31,11 @@ export const GameViewport = () => {
         castShadow={true}
       />
       <pointLight position={[-10, -10, -10]} decay={0} intensity={Math.PI} />
-      {state.units.map((unit) => (
-        <Unit now={Date.now()} key={unit.id} unit={unit} />
-      ))}
+      <group position={[0.5, 0, 0.5]}>
+        {state.units.map((unit) => (
+          <Unit key={unit.id} unit={unit} />
+        ))}
+      </group>
       <Board />
     </Canvas>
   );
