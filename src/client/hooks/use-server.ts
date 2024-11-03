@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef } from "react";
 import EventEmitter from "eventemitter3";
-import { JoinRequest } from "../../api";
+import { Actions } from "../../api";
 import { useUserId } from "./use-user-id";
 
 export const useServer = () => {
-  const userId = useUserId();
+  const { userId, setUserId } = useUserId();
   const socketRef = useRef<WebSocket | null>(null);
   const eventEmitter = useMemo(() => new EventEmitter(), []);
 
@@ -19,7 +19,11 @@ export const useServer = () => {
     socket.onmessage = (event) => {
       console.log(`received: ${event.data}`);
       try {
-        eventEmitter.emit("message", JSON.parse(event.data));
+        const action: Actions = JSON.parse(event.data);
+        if (action.type === "action:sync") {
+          setUserId(action.payload.userId);
+        }
+        eventEmitter.emit("message", action);
       } catch (error) {
         console.error(error);
       }
@@ -27,15 +31,6 @@ export const useServer = () => {
 
     socket.onclose = () => {
       console.log("disconnected");
-    };
-
-    socket.onopen = () => {
-      console.log("connected");
-      const JoinRequest: JoinRequest = {
-        type: "request:join",
-        payload: { userId },
-      };
-      socket.send(JSON.stringify(JoinRequest));
     };
 
     socketRef.current = socket;
@@ -46,7 +41,7 @@ export const useServer = () => {
         socket.send(JSON.stringify(data));
       }
     });
-  }, [eventEmitter, userId]);
+  }, [eventEmitter, userId, setUserId]);
 
   return eventEmitter;
 };

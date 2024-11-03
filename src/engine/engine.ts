@@ -2,7 +2,7 @@ import EventEmitter from "eventemitter3";
 import type {
   Actions,
   MoveAction,
-  Requests,
+  ServerUpgradedRequests,
   State,
   SyncAction,
   UnitDespawnAction,
@@ -50,19 +50,18 @@ export const initEngine = (eventEmitter: EventEmitter) => {
     state = reducer(state, action);
   });
 
-  eventEmitter.on("message", (data: Requests) => {
+  eventEmitter.on("message", (data: ServerUpgradedRequests) => {
     console.log("Received message", data);
     switch (data.type) {
       case "request:move": {
-        const unit = state.units.find(
-          (unit) => unit.id === data.payload.unitId
-        );
+        const unitId = data.payload.session.userId;
+        const unit = state.units.find((unit) => unit.id === unitId);
         if (!unit) {
-          console.warn(`Unit "${data.payload.unitId}" not found`);
+          console.warn(`Unit "${unitId}" not found`);
           return;
         }
         if (unit.type === "moving") {
-          console.warn(`Unit "${data.payload.unitId}" is already moving`);
+          console.warn(`Unit "${unitId}" is already moving`);
           return;
         }
         const inputGrid: boolean[][] = [...Array(10)].map(() =>
@@ -80,7 +79,7 @@ export const initEngine = (eventEmitter: EventEmitter) => {
               x: point.x,
               y: point.y,
             })),
-            unitId: data.payload.unitId,
+            unitId: unitId,
             startFrame: Date.now(),
             endFrame: Date.now() + path.length * 200,
           },
@@ -89,9 +88,11 @@ export const initEngine = (eventEmitter: EventEmitter) => {
         break;
       }
       case "request:join": {
+        const userId = data.payload.session.userId;
         const syncAction: SyncAction = {
           type: "action:sync",
           payload: {
+            userId,
             state,
           },
         };
@@ -103,7 +104,7 @@ export const initEngine = (eventEmitter: EventEmitter) => {
           type: "action:unit-spawn",
           payload: {
             unit: {
-              id: data.payload.userId,
+              id: userId,
               type: "stationary",
               position: randomPosition,
               lookAt: { x: randomPosition.x, y: randomPosition.y - 1 },
@@ -111,15 +112,16 @@ export const initEngine = (eventEmitter: EventEmitter) => {
             },
           },
         };
-        eventEmitter.emit(`message:${data.payload.userId}`, syncAction);
+        eventEmitter.emit(`message:${userId}`, syncAction);
         eventEmitter.emit("broadcast", spawnAction);
         break;
       }
       case "request:leave": {
+        const userId = data.payload.session.userId;
         const action: UnitDespawnAction = {
           type: "action:unit-despawn",
           payload: {
-            unitId: data.payload.userId,
+            unitId: userId,
           },
         };
         eventEmitter.emit("broadcast", action);
