@@ -8,7 +8,6 @@ import type { ExpressAuthConfig } from "@auth/express";
 import GitHub from "@auth/express/providers/github";
 import type { IncomingMessage } from "http";
 import { getSession } from "@auth/express";
-// import ViteExpress from "vite-express";
 
 const expressAuthConfig: ExpressAuthConfig = { providers: [GitHub] };
 
@@ -116,8 +115,6 @@ export const initServer = (eventEmitter: EventEmitter) => {
       });
     });
   });
-
-  // ViteExpress.bind(app, server);
 
   return wss;
 };

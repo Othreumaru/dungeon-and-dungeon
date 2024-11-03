@@ -216,8 +216,11 @@ export function useSession<R extends boolean>(
         error: "SessionRequired",
         callbackUrl: window.location.href,
       })}`;
-      if (onUnauthenticated) onUnauthenticated();
-      else window.location.href = url;
+      if (onUnauthenticated) {
+        onUnauthenticated();
+      } else {
+        window.location.href = url;
+      }
     }
   }, [requiredAndNotLoading, onUnauthenticated]);
 
@@ -287,23 +290,6 @@ export function SessionProvider(props: SessionProviderProps) {
   useEffect(() => {
     __NEXTAUTH._getSession = async ({ event } = {}) => {
       try {
-        if (
-          // If there is no time defined for when a session should be considered
-          // stale, then it's okay to use the value we have until an event is
-          // triggered which updates it
-          !event ||
-          // If the client doesn't have a session then we don't need to call
-          // the server to check if it does (if they have signed in via another
-          // tab or window that will come through as a "stroage" event
-          // event anyway)
-          __NEXTAUTH._session === null ||
-          // Bail out early if the client session is not stale yet
-          now() < __NEXTAUTH._lastSync
-        ) {
-          return;
-        }
-
-        // An event or session staleness occurred, update the client session.
         __NEXTAUTH._lastSync = now();
         __NEXTAUTH._session = await getSession();
         setSession(__NEXTAUTH._session);

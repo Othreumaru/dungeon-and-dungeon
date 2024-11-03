@@ -6,7 +6,7 @@ import { SessionProvider } from "./session-context.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <SessionProvider baseUrl="/auth">
+    <SessionProvider basePath="/auth">
       <App />
     </SessionProvider>
   </StrictMode>
