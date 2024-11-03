@@ -31,7 +31,6 @@ export type State = {
 export type MoveRequest = {
   type: "request:move";
   payload: {
-    unitId: string;
     x: number;
     y: number;
   };
@@ -39,16 +38,10 @@ export type MoveRequest = {
 
 export type JoinRequest = {
   type: "request:join";
-  payload: {
-    userId: string;
-  };
 };
 
 export type LeaveRequest = {
   type: "request:leave";
-  payload: {
-    userId: string;
-  };
 };
 
 export type ChatRequest = {
@@ -58,11 +51,29 @@ export type ChatRequest = {
   };
 };
 
-export type Requests = MoveRequest | JoinRequest | LeaveRequest | ChatRequest;
+export type Requests = MoveRequest | ChatRequest;
+
+export type ServerUpgradedRequest<T> = T & {
+  payload: {
+    session: {
+      userId: string;
+      name: string;
+      email: string;
+      image: string;
+    };
+  };
+};
+
+export type ServerUpgradedRequests =
+  | ServerUpgradedRequest<JoinRequest>
+  | ServerUpgradedRequest<MoveRequest>
+  | ServerUpgradedRequest<LeaveRequest>
+  | ServerUpgradedRequest<ChatRequest>;
 
 export type SyncAction = {
   type: "action:sync";
   payload: {
+    userId: string;
     state: State;
   };
 };

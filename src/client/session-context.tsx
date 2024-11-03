@@ -288,7 +288,7 @@ export function SessionProvider(props: SessionProviderProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    __NEXTAUTH._getSession = async ({ event } = {}) => {
+    __NEXTAUTH._getSession = async () => {
       try {
         __NEXTAUTH._lastSync = now();
         __NEXTAUTH._session = await getSession();

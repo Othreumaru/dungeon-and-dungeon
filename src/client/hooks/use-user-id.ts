@@ -1,11 +1,10 @@
-import { v4 as uuidv4 } from "uuid";
+import { useState } from "react";
 
 export const useUserId = () => {
-  const storedUserId = localStorage.getItem("userId");
-  if (storedUserId) {
-    return storedUserId;
-  }
-  const userId = uuidv4();
-  localStorage.setItem("userId", userId);
-  return userId;
+  const [userId, setUserId] = useState<string | null>(null);
+
+  return {
+    userId,
+    setUserId,
+  };
 };

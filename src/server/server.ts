@@ -1,6 +1,11 @@
 import EventEmitter from "eventemitter3";
 import WebSocket, { WebSocketServer } from "ws";
-import type { LeaveRequest, Requests } from "../api.ts";
+import type {
+  JoinRequest,
+  LeaveRequest,
+  ServerUpgradedRequest,
+  ServerUpgradedRequests,
+} from "../api.ts";
 import express from "express";
 import type { Request } from "express";
 import { ExpressAuth } from "@auth/express";
@@ -8,6 +13,19 @@ import type { ExpressAuthConfig } from "@auth/express";
 import GitHub from "@auth/express/providers/github";
 import type { IncomingMessage } from "http";
 import { getSession } from "@auth/express";
+import crypto from "crypto";
+
+type Session = {
+  name: string;
+  email: string;
+  image: string;
+};
+type UpgradedWebSocket = WebSocket & { session: Session };
+
+const hashStr = (str: string) => {
+  const hash = crypto.createHash("md5").update(str).digest("hex");
+  return hash;
+};
 
 const expressAuthConfig: ExpressAuthConfig = { providers: [GitHub] };
 
@@ -34,10 +52,31 @@ export const initServer = (eventEmitter: EventEmitter) => {
   });
 
   wss.on("connection", (ws) => {
+    const session = (ws as UpgradedWebSocket).session;
+    const userId = hashStr(session.email + session.name);
+
+    eventEmitter.on(`message:${userId}`, (data) => {
+      ws.send(JSON.stringify(data));
+    });
+
+    const joinRequest: ServerUpgradedRequest<JoinRequest> = {
+      type: "request:join",
+      payload: {
+        session: {
+          userId,
+          name: session.name,
+          image: session.image,
+          email: session.email,
+        },
+      },
+    };
+
+    eventEmitter.emit("message", joinRequest);
+
     ws.on("error", console.error);
 
     ws.on("message", (data) => {
-      const request: Requests = JSON.parse(data.toString());
+      const request: ServerUpgradedRequests = JSON.parse(data.toString());
       if (request.type === "request:chat") {
         eventEmitter.emit("broadcast", {
           type: "action:chat",
@@ -47,24 +86,33 @@ export const initServer = (eventEmitter: EventEmitter) => {
           },
         });
       }
-      if (request.type === "request:join") {
-        (ws as unknown as { userId: string }).userId = request.payload.userId;
-        eventEmitter.on(`message:${request.payload.userId}`, (data) => {
-          ws.send(JSON.stringify(data));
+
+      if (request.type !== "request:join") {
+        eventEmitter.emit("message", {
+          ...request,
+          payload: {
+            ...request.payload,
+            session: {
+              userId,
+              ...session,
+            },
+          },
         });
       }
-      eventEmitter.emit("message", request);
     });
 
     ws.on("close", () => {
-      const leaveRequest: LeaveRequest = {
+      const leaveRequest: ServerUpgradedRequest<LeaveRequest> = {
         type: "request:leave",
         payload: {
-          userId: (ws as unknown as { userId: string }).userId,
+          session: {
+            userId,
+            ...session,
+          },
         },
       };
       eventEmitter.emit("message", leaveRequest);
-      eventEmitter.removeAllListeners(`message:${leaveRequest.payload.userId}`);
+      eventEmitter.removeAllListeners(`message:${userId}`);
     });
   });
 
@@ -72,19 +120,15 @@ export const initServer = (eventEmitter: EventEmitter) => {
     console.error(err);
   }
 
-  type Client = {
-    id?: string;
-  };
-
   async function authenticate(
     request: IncomingMessage,
-    next: (err: Error | null, client: Client | null) => void
+    next: (err: Error | null, client: Session | null) => void
   ) {
     const session = await getSession(request as Request, expressAuthConfig);
     if (!session || session.user === undefined) {
       return next(new Error("Unauthorized"), null);
     }
-    next(null, session.user);
+    next(null, session.user as Session);
   }
 
   server.on("upgrade", (request, socket, head) => {
@@ -111,6 +155,7 @@ export const initServer = (eventEmitter: EventEmitter) => {
       socket.removeListener("error", onSocketError);
 
       wss.handleUpgrade(request, socket, head, (ws) => {
+        (ws as UpgradedWebSocket).session = client;
         wss.emit("connection", ws, request, client);
       });
     });

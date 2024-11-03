@@ -2,7 +2,7 @@ import { createContext } from "react";
 import { useServer } from "./hooks/use-server";
 import EventEmitter from "eventemitter3";
 
-export const ThemeContext = createContext<EventEmitter>(
+export const EventEmitterContext = createContext<EventEmitter>(
   null as unknown as EventEmitter
 );
 
@@ -14,8 +14,8 @@ export const ServerContextProvider = ({
   const eventEmitter = useServer();
 
   return (
-    <ThemeContext.Provider value={eventEmitter}>
+    <EventEmitterContext.Provider value={eventEmitter}>
       {children}
-    </ThemeContext.Provider>
+    </EventEmitterContext.Provider>
   );
 };
