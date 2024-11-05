@@ -9,16 +9,13 @@ import {
   useMotion,
 } from "../motion-path-controls/motion-path-controls";
 import { PositionalAudio } from "@react-three/drei";
+import { clamp } from "../../../libs/math/clamp";
 
 const MAGE_SCALE: THREE.Vector3 = new THREE.Vector3(0.5, 0.5, 0.5);
 const MAGE_POSITION: THREE.Vector3 = new THREE.Vector3(0, -0.1, 0);
 const MAGE_ROTATION: THREE.Euler = new THREE.Euler(0, 0, 0);
 
 const MAX_MOTION_VALUE = 0.99999999;
-
-function clamp(value: number, min: number, max: number) {
-  return Math.max(min, Math.min(max, value));
-}
 
 const focusDamping = 0.1;
 const maxSpeed = Infinity;

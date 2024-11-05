@@ -134,7 +134,6 @@ export const initServer = (eventEmitter: EventEmitter) => {
   server.on("upgrade", (request, socket, head) => {
     socket.on("error", onSocketError);
 
-    // This function is not defined on purpose. Implement it with your own logic.
     void authenticate(request, (err, client) => {
       if (err || !client) {
         socket.write("HTTP/1.1 401 Unauthorized\r\n\r\n");
