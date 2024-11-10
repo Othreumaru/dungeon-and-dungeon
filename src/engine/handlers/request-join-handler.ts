@@ -55,6 +55,7 @@ export const requestJoinHandler = (
       unit: {
         id: userId,
         type: "stationary",
+        model: "mage",
         position: randomPosition,
         lookAt: { x: randomPosition.x, y: randomPosition.y - 1 },
         color: colors[Math.floor(Math.random() * colors.length)],

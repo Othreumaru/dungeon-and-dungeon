@@ -1,6 +1,7 @@
 type BaseUnit = {
   id: string;
   color: string;
+  model: "skeleton-minion" | "mage";
 };
 
 export type StationaryUnit = BaseUnit & {

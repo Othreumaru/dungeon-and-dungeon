@@ -77,6 +77,7 @@ Sample1.args = {
   unit: {
     id: "1",
     type: "moving",
+    model: "mage",
     startFrame: 0,
     endFrame: 500,
     path: [
