@@ -15,6 +15,7 @@ describe("reducer", () => {
         {
           id: "1",
           type: "stationary",
+          model: "skeleton-minion",
           position: {
             x: 0,
             y: 0,
@@ -28,6 +29,7 @@ describe("reducer", () => {
         {
           id: "2",
           type: "stationary",
+          model: "skeleton-minion",
           position: {
             x: 0,
             y: 0,
@@ -63,6 +65,7 @@ describe("reducer", () => {
         {
           id: "1",
           type: "moving",
+          model: "skeleton-minion",
           path: [
             {
               x: 0,
@@ -80,6 +83,7 @@ describe("reducer", () => {
         {
           id: "2",
           type: "stationary",
+          model: "skeleton-minion",
           position: {
             x: 0,
             y: 0,
@@ -108,6 +112,7 @@ describe("reducer", () => {
         {
           id: "1",
           type: "stationary",
+          model: "skeleton-minion",
           position: {
             x: 10,
             y: 20,
@@ -121,6 +126,7 @@ describe("reducer", () => {
         {
           id: "2",
           type: "stationary",
+          model: "skeleton-minion",
           position: {
             x: 0,
             y: 0,
