@@ -2,7 +2,22 @@ import type { Actions } from "../api.ts";
 import type { State } from "../api.ts";
 
 export const initialState: State = {
-  units: [],
+  units: [
+    {
+      id: "1",
+      color: "red",
+      type: "stationary",
+      model: "skeleton-minion",
+      position: {
+        x: 0,
+        y: 0,
+      },
+      lookAt: {
+        x: 1,
+        y: 0,
+      },
+    },
+  ],
 };
 
 export const reducer = (
@@ -21,6 +36,7 @@ export const reducer = (
                 id: unit.id,
                 color: unit.color,
                 type: "moving",
+                model: unit.model,
                 startFrame: action.payload.startFrame,
                 endFrame: action.payload.endFrame,
                 path: [
@@ -48,6 +64,7 @@ export const reducer = (
                 ? {
                     id: unit.id,
                     color: unit.color,
+                    model: unit.model,
                     type: "stationary",
                     position: {
                       x: unit.path[unit.path.length - 1].x,

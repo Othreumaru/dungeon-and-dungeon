@@ -10,6 +10,7 @@ import {
 } from "../motion-path-controls/motion-path-controls";
 import { PositionalAudio } from "@react-three/drei";
 import { clamp } from "../../../libs/math/clamp";
+import { SkeletonMinion } from "../skeleton-minion/skeleton-minion";
 
 const MAGE_SCALE: THREE.Vector3 = new THREE.Vector3(0.5, 0.5, 0.5);
 const MAGE_POSITION: THREE.Vector3 = new THREE.Vector3(0, -0.1, 0);
@@ -159,7 +160,9 @@ const MovingComponent = ({
 export const Unit = ({ unit }: { unit: UnitType; now?: number }) => {
   const unitRef = useRef<THREE.Group>(null);
   const audioRef = useRef<THREE.PositionalAudio>(null);
-  const unitApiRef = useRef<MageApi>(null);
+  const unitApiRef = useRef<{
+    playAnimation: (animation: string) => void;
+  }>(null);
 
   useEffect(() => {
     audioRef.current?.setVolume(0.1);
@@ -170,12 +173,22 @@ export const Unit = ({ unit }: { unit: UnitType; now?: number }) => {
   return (
     <group>
       <group ref={unitRef}>
-        <Mage
-          ref={unitApiRef}
-          position={MAGE_POSITION}
-          scale={MAGE_SCALE}
-          rotation={MAGE_ROTATION}
-        />
+        {unit.model === "skeleton-minion" && (
+          <SkeletonMinion
+            ref={unitApiRef}
+            position={MAGE_POSITION}
+            scale={MAGE_SCALE}
+            rotation={MAGE_ROTATION}
+          />
+        )}
+        {unit.model === "mage" && (
+          <Mage
+            ref={unitApiRef}
+            position={MAGE_POSITION}
+            scale={MAGE_SCALE}
+            rotation={MAGE_ROTATION}
+          />
+        )}
         <PositionalAudio
           ref={audioRef}
           url="./Steps_tiles-010.ogg"

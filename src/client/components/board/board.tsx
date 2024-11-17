@@ -2,20 +2,16 @@ import * as THREE from "three";
 import { useEffect, useRef } from "react";
 import { useServerContext } from "../../hooks/use-server-context";
 import { MoveRequest } from "../../../api";
-import { useUserId } from "../../hooks/use-user-id";
 
 export const Board = ({
   count = 100,
   temp = new THREE.Object3D(),
-  //   tempVector = new THREE.Vector3(),
-  //   tempMatrix = new THREE.Matrix4(),
 }: {
   count?: number;
   temp?: THREE.Object3D;
   tempVector?: THREE.Vector3;
   tempMatrix?: THREE.Matrix4;
 }) => {
-  const userId = useUserId();
   const eventEmitter = useServerContext();
 
   const boxRef = useRef<THREE.Mesh>(null);
@@ -63,7 +59,6 @@ export const Board = ({
           eventEmitter.emit("request", {
             type: "request:move",
             payload: {
-              unitId: userId,
               x: Math.floor(event.intersections[0].point.x),
               y: Math.floor(event.intersections[0].point.z),
             },

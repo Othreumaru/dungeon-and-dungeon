@@ -194,28 +194,31 @@ const MageComponent: ForwardRefRenderFunction<
   );
   const bonesRef = useRef<THREE.Bone[]>([]);
 
-  const addBoneRoot = useCallback((boneRef: THREE.Bone) => {
-    if (bonesRef.current.length === 0) {
-      const bones: THREE.Bone[] = [];
-      const traverse = (bone: THREE.Bone) => {
-        bones.push(bone);
-        bone.children.forEach((child) => {
-          if (child instanceof THREE.Bone) {
-            traverse(child);
-          }
-        });
-      };
-      traverse(boneRef);
-      bonesRef.current = bones;
+  const addBoneRoot = useCallback(
+    (boneRef: THREE.Bone) => {
+      if (bonesRef.current.length === 0) {
+        const bones: THREE.Bone[] = [];
+        const traverse = (bone: THREE.Bone) => {
+          bones.push(bone);
+          bone.children.forEach((child) => {
+            if (child instanceof THREE.Bone) {
+              traverse(child);
+            }
+          });
+        };
+        traverse(boneRef);
+        bonesRef.current = bones;
 
-      const boneInverses: THREE.Matrix4[] = [];
-      nodes["Mage_ArmLeft"].skeleton.boneInverses.forEach((inverse) => {
-        boneInverses.push(inverse.clone());
-      });
-      const skeletonInstance = new THREE.Skeleton(bones, boneInverses);
-      setSkeleton(skeletonInstance);
-    }
-  }, []);
+        const boneInverses: THREE.Matrix4[] = [];
+        nodes["Mage_ArmLeft"].skeleton.boneInverses.forEach((inverse) => {
+          boneInverses.push(inverse.clone());
+        });
+        const skeletonInstance = new THREE.Skeleton(bones, boneInverses);
+        setSkeleton(skeletonInstance);
+      }
+    },
+    [nodes]
+  );
 
   useEffect(() => {
     if (!animation || !actions[animation]) {
