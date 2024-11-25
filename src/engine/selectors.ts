@@ -13,17 +13,17 @@ export const getUnitPosition = (
       };
     }
   | undefined => {
-  if (unit.type === "stationary") {
+  if (unit.state.type === "stationary") {
     return {
-      position: unit.position,
-      lookAt: unit.lookAt,
+      position: unit.state.position,
+      lookAt: unit.state.lookAt,
     };
   }
-  const path = unit.path;
+  const path = unit.state.path;
   if (path.length === 0) {
     return undefined;
   }
-  if (unit.endFrame > frame) {
+  if (unit.state.endFrame > frame) {
     return {
       position: path[0],
       lookAt:
@@ -35,7 +35,7 @@ export const getUnitPosition = (
             },
     };
   }
-  if (unit.endFrame < frame) {
+  if (unit.state.endFrame < frame) {
     const lookAtVector = normalize2D({
       x: path[path.length - 1].x - path[path.length - 2].x,
       y: path[path.length - 1].y - path[path.length - 2].y,
@@ -50,9 +50,9 @@ export const getUnitPosition = (
     return lastFrame;
   }
   for (let i = 0; i < path.length - 1; i++) {
-    const pathDuration = (unit.endFrame - unit.startFrame) / path.length;
-    const iFrame = unit.startFrame + i * pathDuration;
-    const nextFrame = unit.startFrame + (i + 1) * pathDuration;
+    const pathDuration = (unit.state.endFrame - unit.state.startFrame) / path.length;
+    const iFrame = unit.state.startFrame + i * pathDuration;
+    const nextFrame = unit.state.startFrame + (i + 1) * pathDuration;
     if (iFrame <= frame && nextFrame >= frame) {
       const progress = (frame - iFrame) / (nextFrame - iFrame);
       const lookAtVector = normalize2D({

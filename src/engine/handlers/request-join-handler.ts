@@ -54,10 +54,13 @@ export const requestJoinHandler = (
     payload: {
       unit: {
         id: userId,
-        type: "stationary",
+        state: {
+          type: "stationary",
+          position: randomPosition,
+          lookAt: { x: randomPosition.x, y: randomPosition.y - 1 },
+        },
+        controller: { type: "player" },
         model: "mage",
-        position: randomPosition,
-        lookAt: { x: randomPosition.x, y: randomPosition.y - 1 },
         color: colors[Math.floor(Math.random() * colors.length)],
       },
     },

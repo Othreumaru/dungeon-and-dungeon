@@ -18,7 +18,7 @@ export const requestMoveHandler = (
     console.warn(`Unit "${unitId}" not found`);
     return;
   }
-  if (unit.type === "moving") {
+  if (unit.state.type === "moving") {
     console.warn(`Unit "${unitId}" is already moving`);
     return;
   }
@@ -27,7 +27,7 @@ export const requestMoveHandler = (
   );
   const path = aStarSolver(
     inputGrid,
-    { x: unit.position.x, y: unit.position.y },
+    { x: unit.state.position.x, y: unit.state.position.y },
     { x: data.payload.x, y: data.payload.y }
   );
   const action: MoveAction = {

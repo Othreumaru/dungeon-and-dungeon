@@ -7,16 +7,20 @@ describe("getUnitPosition", () => {
   it("should return stationary unit", () => {
     const unit: Unit = {
       id: "1",
-      type: "stationary",
-      position: {
-        x: 10,
-        y: 20,
-      },
-      lookAt: {
-        x: 11,
-        y: 20,
+      state: {
+        type: "stationary",
+        position: {
+          x: 10,
+          y: 20,
+        },
+        lookAt: {
+          x: 11,
+          y: 20,
+        },
       },
       color: "blue",
+      model: "skeleton-minion",
+      controller: { type: "player" },
     };
 
     const result = getUnitPosition(unit, 0);
@@ -29,11 +33,16 @@ describe("getUnitPosition", () => {
   it("should return undefined if path is empty", () => {
     const unit: Unit = {
       id: "1",
-      type: "moving",
-      path: [],
+      state: {
+        type: "moving",
+        path: [],
+        startFrame: 100,
+        endFrame: 200,
+      },
       color: "blue",
-      startFrame: 100,
-      endFrame: 200,
+
+      model: "skeleton-minion",
+      controller: { type: "player" },
     };
     const result = getUnitPosition(unit, 0);
     deepStrictEqual(result, undefined);
@@ -42,16 +51,20 @@ describe("getUnitPosition", () => {
   it("should return first path point if frame is before first frame", () => {
     const unit: Unit = {
       id: "1",
-      type: "moving",
-      path: [
-        {
-          x: 10,
-          y: 20,
-        },
-      ],
-      startFrame: 100,
-      endFrame: 200,
+      state: {
+        type: "moving",
+        path: [
+          {
+            x: 10,
+            y: 20,
+          },
+        ],
+        startFrame: 100,
+        endFrame: 200,
+      },
       color: "blue",
+      model: "skeleton-minion",
+      controller: { type: "player" },
     };
     const result = getUnitPosition(unit, 50);
     deepStrictEqual(result?.position.x, 10);
@@ -63,20 +76,24 @@ describe("getUnitPosition", () => {
   it("should return last path point if frame is after last frame", () => {
     const state: Unit = {
       id: "1",
-      type: "moving",
-      path: [
-        {
-          x: 10,
-          y: 20,
-        },
-        {
-          x: 10,
-          y: 21,
-        },
-      ],
-      startFrame: 100,
-      endFrame: 200,
+      state: {
+        type: "moving",
+        path: [
+          {
+            x: 10,
+            y: 20,
+          },
+          {
+            x: 10,
+            y: 21,
+          },
+        ],
+        startFrame: 100,
+        endFrame: 200,
+      },
       color: "blue",
+      model: "skeleton-minion",
+      controller: { type: "player" },
     };
     const result = getUnitPosition(state, 250);
     deepStrictEqual(result?.position.x, 10);
@@ -88,20 +105,24 @@ describe("getUnitPosition", () => {
   it("should interpolate position", () => {
     const state: Unit = {
       id: "1",
-      type: "moving",
-      path: [
-        {
-          x: 10,
-          y: 20,
-        },
-        {
-          x: 20,
-          y: 30,
-        },
-      ],
-      startFrame: 100,
-      endFrame: 200,
+      state: {
+        type: "moving",
+        path: [
+          {
+            x: 10,
+            y: 20,
+          },
+          {
+            x: 20,
+            y: 30,
+          },
+        ],
+        startFrame: 100,
+        endFrame: 200,
+      },
       color: "blue",
+      model: "skeleton-minion",
+      controller: { type: "player" },
     };
     const result = getUnitPosition(state, 150);
     deepStrictEqual(result?.position.x, 10);

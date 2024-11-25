@@ -196,18 +196,18 @@ export const Unit = ({ unit }: { unit: UnitType; now?: number }) => {
           loop={true}
         />
       </group>
-      {unit.type === "moving" && (
+      {unit.state.type === "moving" && (
         <MovingComponent
           unitRef={unitRef as React.MutableRefObject<THREE.Object3D>}
           audioRef={audioRef as React.MutableRefObject<THREE.PositionalAudio>}
           unitApiRef={unitApiRef as React.MutableRefObject<MageApi>}
-          unit={unit}
+          unit={unit.state}
         />
       )}
-      {unit.type === "stationary" && (
+      {unit.state.type === "stationary" && (
         <StationaryComponent
           unitRef={unitRef as React.MutableRefObject<THREE.Object3D>}
-          unit={unit}
+          unit={unit.state}
         />
       )}
     </group>

@@ -14,31 +14,38 @@ describe("reducer", () => {
       units: [
         {
           id: "1",
-          type: "stationary",
+          state: {
+            type: "stationary",
+            position: {
+              x: 0,
+              y: 0,
+            },
+            lookAt: {
+              x: 1,
+              y: 0,
+            },
+          },
           model: "skeleton-minion",
-          position: {
-            x: 0,
-            y: 0,
-          },
-          lookAt: {
-            x: 1,
-            y: 0,
-          },
+
           color: "blue",
+          controller: { type: "player" },
         },
         {
           id: "2",
-          type: "stationary",
+          state: {
+            type: "stationary",
+            position: {
+              x: 0,
+              y: 0,
+            },
+            lookAt: {
+              x: 1,
+              y: 0,
+            },
+          },
           model: "skeleton-minion",
-          position: {
-            x: 0,
-            y: 0,
-          },
-          lookAt: {
-            x: 1,
-            y: 0,
-          },
           color: "red",
+          controller: { type: "player" },
         },
       ],
     };
@@ -64,35 +71,41 @@ describe("reducer", () => {
       units: [
         {
           id: "1",
-          type: "moving",
+          state: {
+            type: "moving",
+            path: [
+              {
+                x: 0,
+                y: 0,
+              },
+              {
+                x: 10,
+                y: 20,
+              },
+            ],
+            startFrame: 100,
+            endFrame: 200,
+          },
           model: "skeleton-minion",
-          path: [
-            {
-              x: 0,
-              y: 0,
-            },
-            {
-              x: 10,
-              y: 20,
-            },
-          ],
-          startFrame: 100,
-          endFrame: 200,
           color: "blue",
+          controller: { type: "player" },
         },
         {
           id: "2",
-          type: "stationary",
+          state: {
+            type: "stationary",
+            position: {
+              x: 0,
+              y: 0,
+            },
+            lookAt: {
+              x: 1,
+              y: 0,
+            },
+          },
           model: "skeleton-minion",
-          position: {
-            x: 0,
-            y: 0,
-          },
-          lookAt: {
-            x: 1,
-            y: 0,
-          },
           color: "red",
+          controller: { type: "player" },
         },
       ],
     });
@@ -111,31 +124,37 @@ describe("reducer", () => {
       units: [
         {
           id: "1",
-          type: "stationary",
+          state: {
+            type: "stationary",
+            position: {
+              x: 10,
+              y: 20,
+            },
+            lookAt: {
+              x: 11,
+              y: 20,
+            },
+          },
           model: "skeleton-minion",
-          position: {
-            x: 10,
-            y: 20,
-          },
-          lookAt: {
-            x: 11,
-            y: 20,
-          },
           color: "blue",
+          controller: { type: "player" },
         },
         {
           id: "2",
-          type: "stationary",
+          state: {
+            type: "stationary",
+            position: {
+              x: 0,
+              y: 0,
+            },
+            lookAt: {
+              x: 1,
+              y: 0,
+            },
+          },
           model: "skeleton-minion",
-          position: {
-            x: 0,
-            y: 0,
-          },
-          lookAt: {
-            x: 1,
-            y: 0,
-          },
           color: "red",
+          controller: { type: "player" },
         },
       ],
     });
