@@ -1,18 +1,16 @@
 import EventEmitter from "eventemitter3";
-import type {
-  Actions,
-  ServerUpgradedRequests,
-  State,
-} from "../api.ts";
+import type { Actions, ServerUpgradedRequests, State } from "../api.ts";
 import { initialState, reducer } from "./reducer.ts";
 import { requestJoinHandler } from "./handlers/request-join-handler.ts";
 import { requestLeaveHandler } from "./handlers/request-leave-handler.ts";
 import { requestMoveHandler } from "./handlers/request-move-handler.ts";
+import { tickHandler } from "./handlers/tick-handler.ts";
 
 export const initEngine = (eventEmitter: EventEmitter) => {
   let state: State = initialState;
 
   setInterval(() => {
+    tickHandler(state, eventEmitter);
     state = reducer(state, {
       type: "action:frame-tick",
       payload: { frame: Date.now() },

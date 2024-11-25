@@ -1,10 +1,52 @@
+type PatrolState = {
+  type: "patrol";
+  startFrame: number;
+  endFrame: number;
+};
+
+type AttackState = {
+  type: "attack";
+  target: string;
+  startFrame: number;
+  endFrame: number;
+};
+
+type PatrolAndAttackState = PatrolState | AttackState;
+
+type PatrolAndAttack = {
+  type: "patrol-and-attack";
+  attackRange: number;
+  state: PatrolAndAttackState;
+};
+
+type DefendAndAttack = {
+  type: "defend-and-attack";
+  defendPosition: { x: number; y: number };
+  attackRange: number;
+};
+
+type AIControllerAlgorithm = PatrolAndAttack | DefendAndAttack;
+
+type PlayerController = {
+  type: "player";
+};
+
+type AIController = {
+  type: "ai";
+  algorithm: AIControllerAlgorithm;
+};
+
+type Controller = PlayerController | AIController;
+
 type BaseUnit = {
   id: string;
   color: string;
   model: "skeleton-minion" | "mage";
+  controller: Controller;
+  state: StationaryUnit | MovingUnit;
 };
 
-export type StationaryUnit = BaseUnit & {
+export type StationaryUnit = {
   type: "stationary";
   position: {
     x: number;
@@ -16,14 +58,14 @@ export type StationaryUnit = BaseUnit & {
   };
 };
 
-export type MovingUnit = BaseUnit & {
+export type MovingUnit = {
   type: "moving";
   startFrame: number;
   endFrame: number;
   path: { x: number; y: number }[];
 };
 
-export type Unit = StationaryUnit | MovingUnit;
+export type Unit = BaseUnit;
 
 export type State = {
   units: Unit[];

@@ -76,32 +76,38 @@ Sample1.args = {
   now: 1,
   unit: {
     id: "1",
-    type: "moving",
+    state: {
+      type: "moving",
+      startFrame: 0,
+      endFrame: 500,
+      path: [
+        {
+          x: 0,
+          y: 0,
+        },
+        {
+          x: 1,
+          y: 0,
+        },
+        {
+          x: 1,
+          y: 1,
+        },
+        {
+          x: 0,
+          y: 1,
+        },
+        {
+          x: 0,
+          y: 0,
+        },
+      ],
+    },
     model: "mage",
-    startFrame: 0,
-    endFrame: 500,
-    path: [
-      {
-        x: 0,
-        y: 0,
-      },
-      {
-        x: 1,
-        y: 0,
-      },
-      {
-        x: 1,
-        y: 1,
-      },
-      {
-        x: 0,
-        y: 1,
-      },
-      {
-        x: 0,
-        y: 0,
-      },
-    ],
+
+    controller: {
+      type: "player",
+    },
     color: "blue",
   },
 };
