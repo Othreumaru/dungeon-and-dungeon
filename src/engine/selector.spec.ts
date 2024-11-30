@@ -19,6 +19,7 @@ describe("getUnitPosition", () => {
         },
       },
       color: "blue",
+      actions: [],
       model: "skeleton-minion",
       controller: { type: "player" },
     };
@@ -40,7 +41,7 @@ describe("getUnitPosition", () => {
         endFrame: 200,
       },
       color: "blue",
-
+      actions: [],
       model: "skeleton-minion",
       controller: { type: "player" },
     };
@@ -62,6 +63,7 @@ describe("getUnitPosition", () => {
         startFrame: 100,
         endFrame: 200,
       },
+      actions: [],
       color: "blue",
       model: "skeleton-minion",
       controller: { type: "player" },
@@ -91,6 +93,7 @@ describe("getUnitPosition", () => {
         startFrame: 100,
         endFrame: 200,
       },
+      actions: [],
       color: "blue",
       model: "skeleton-minion",
       controller: { type: "player" },
@@ -120,6 +123,7 @@ describe("getUnitPosition", () => {
         startFrame: 100,
         endFrame: 200,
       },
+      actions: [],
       color: "blue",
       model: "skeleton-minion",
       controller: { type: "player" },

@@ -61,6 +61,15 @@ export const requestJoinHandler = (
         },
         controller: { type: "player" },
         model: "mage",
+        actions: [
+          {
+            name: "move",
+            cooldown: {
+              startFrame: 0,
+              endFrame: 0,
+            },
+          },
+        ],
         color: colors[Math.floor(Math.random() * colors.length)],
       },
     },
