@@ -104,7 +104,7 @@ Sample1.args = {
       ],
     },
     model: "mage",
-
+    actions: [],
     controller: {
       type: "player",
     },

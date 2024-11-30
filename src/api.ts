@@ -38,11 +38,20 @@ type AIController = {
 
 type Controller = PlayerController | AIController;
 
+type UnitAction = {
+  name: string;
+  cooldown: {
+    startFrame: number;
+    endFrame: number;
+  };
+};
+
 type BaseUnit = {
   id: string;
   color: string;
   model: "skeleton-minion" | "mage";
   controller: Controller;
+  actions: UnitAction[];
   state: StationaryUnit | MovingUnit;
 };
 

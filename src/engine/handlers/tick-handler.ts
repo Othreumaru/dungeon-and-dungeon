@@ -33,6 +33,7 @@ export const tickHandler = (state: State, eventEmitter: EventEmitter) => {
             endFrame: Date.now() + 2000,
           },
           model: "skeleton-minion",
+          actions: [],
           controller: {
             type: "ai",
             algorithm: {

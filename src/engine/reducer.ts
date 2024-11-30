@@ -22,6 +22,7 @@ export const reducer = (
                 color: unit.color,
                 model: unit.model,
                 controller: unit.controller,
+                actions: unit.actions,
                 state: {
                   type: "moving",
                   startFrame: action.payload.startFrame,
@@ -57,6 +58,7 @@ export const reducer = (
                     color: unit.color,
                     model: unit.model,
                     controller: unit.controller,
+                    actions: unit.actions,
                     state: {
                       type: "stationary",
                       position: {

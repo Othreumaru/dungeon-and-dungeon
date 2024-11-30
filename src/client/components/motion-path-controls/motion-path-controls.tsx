@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import * as React from "react";
-import { useFrame, useThree } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
 import { easing, misc } from "maath";
 
 type MotionPathProps = JSX.IntrinsicElements["group"] & {
@@ -115,9 +115,10 @@ export const MotionPathControls = /* @__PURE__ */ React.forwardRef<
     }: MotionPathProps,
     fref
   ) => {
-    const { camera } = useThree();
+    // const { camera } = useThree();
     const ref = React.useRef<THREE.Group>(null);
     const [path] = React.useState(() => new THREE.CurvePath<THREE.Vector3>());
+    const [objectRef] = React.useState(() => new THREE.Object3D());
 
     const pos = React.useRef(offset ?? 0);
     const state = React.useMemo<MotionState>(
@@ -126,7 +127,7 @@ export const MotionPathControls = /* @__PURE__ */ React.forwardRef<
         object:
           object?.current instanceof THREE.Object3D
             ? object
-            : { current: camera },
+            : { current: objectRef },
         path,
         current: pos.current,
         offset: pos.current,
@@ -134,7 +135,7 @@ export const MotionPathControls = /* @__PURE__ */ React.forwardRef<
         tangent: new THREE.Vector3(),
         next: new THREE.Vector3(),
       }),
-      [focus, object]
+      [focus, object, path]
     );
 
     React.useLayoutEffect(() => {
@@ -189,7 +190,8 @@ export const MotionPathControls = /* @__PURE__ */ React.forwardRef<
           state.next
         );
         const target =
-          object?.current instanceof THREE.Object3D ? object.current : camera;
+          object?.current instanceof THREE.Object3D ? object.current : null;
+        if (!target) return;
         target.position.copy(state.point);
         if (focus) {
           easing.dampLookAt(
