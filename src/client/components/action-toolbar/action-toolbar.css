@@ -1,0 +1,40 @@
+.action-toolbar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  height: 4rem;
+  display: flex;
+  flex-direction: row;
+  width: 20rem;
+}
+
+.action {
+  background-color: #393939;
+  padding: 1rem;
+  border: 1px solid #e0e0e0;
+  height: 1.5rem;
+  width: 2.2rem;
+  border-radius: 5px;
+  position: relative;
+}
+
+.action-cooldown-progress {
+  background-color: #5a5a5a;
+
+  position: absolute;
+  top: 10px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+
+  background-color: #5a5a5a;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.action-label {
+  color: white;
+  font-size: 0.8rem;
+  text-align: center;
+  position: absolute;
+}

@@ -38,12 +38,22 @@ type AIController = {
 
 type Controller = PlayerController | AIController;
 
-type UnitAction = {
+type UnitActionReadyState = {
+  type: "ready";
+};
+
+type UnitActionCooldownState = {
+  type: "cooldown";
+  startFrame: number;
+  endFrame: number;
+};
+
+type UnitActionState = UnitActionReadyState | UnitActionCooldownState;
+
+export type UnitAction = {
   name: string;
-  cooldown: {
-    startFrame: number;
-    endFrame: number;
-  };
+  cooldownSec: number;
+  state: UnitActionState;
 };
 
 type BaseUnit = {

@@ -64,9 +64,9 @@ export const requestJoinHandler = (
         actions: [
           {
             name: "move",
-            cooldown: {
-              startFrame: 0,
-              endFrame: 0,
+            cooldownSec: 8,
+            state: {
+              type: "ready",
             },
           },
         ],

@@ -10,11 +10,11 @@ export const initEngine = (eventEmitter: EventEmitter) => {
   let state: State = initialState;
 
   setInterval(() => {
-    tickHandler(state, eventEmitter);
     state = reducer(state, {
       type: "action:frame-tick",
       payload: { frame: Date.now() },
     });
+    tickHandler(state, eventEmitter);
   }, 100);
 
   eventEmitter.on("broadcast", (action: Actions) => {

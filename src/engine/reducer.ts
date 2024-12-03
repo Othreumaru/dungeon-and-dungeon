@@ -1,5 +1,11 @@
-import type { Actions } from "../api.ts";
+import type { Actions, Unit } from "../api.ts";
 import type { State } from "../api.ts";
+import {
+  isAnyUnitDoneMoving,
+  isUnitActionCooldownReady,
+  isUnitAnyActionCooldownReady,
+  isUnitDoneMoving,
+} from "./selectors.ts";
 
 export const initialState: State = {
   units: [],
@@ -22,7 +28,19 @@ export const reducer = (
                 color: unit.color,
                 model: unit.model,
                 controller: unit.controller,
-                actions: unit.actions,
+                actions: unit.actions.map((action) => {
+                  if (action.name === "move") {
+                    return {
+                      ...action,
+                      state: {
+                        type: "cooldown",
+                        startFrame: Date.now(),
+                        endFrame: Date.now() + action.cooldownSec * 1000,
+                      },
+                    };
+                  }
+                  return action;
+                }),
                 state: {
                   type: "moving",
                   startFrame: action.payload.startFrame,
@@ -42,37 +60,58 @@ export const reducer = (
     case "action:chat":
       return state;
     case "action:frame-tick": {
-      const doneMoving = state.units.some(
-        (unit) =>
-          unit.state.type === "moving" &&
-          unit.state.endFrame < action.payload.frame
+      const doneMoving = isAnyUnitDoneMoving(state.units, action.payload.frame);
+      const actionCooldownReady = state.units.some((unit) =>
+        isUnitAnyActionCooldownReady(unit, action.payload.frame)
       );
-      return doneMoving
+      return doneMoving || actionCooldownReady
         ? {
             ...state,
-            units: state.units.map((unit) =>
-              unit.state.type === "moving" &&
-              unit.state.endFrame < action.payload.frame
-                ? {
-                    id: unit.id,
-                    color: unit.color,
-                    model: unit.model,
-                    controller: unit.controller,
-                    actions: unit.actions,
-                    state: {
-                      type: "stationary",
-                      position: {
-                        x: unit.state.path[unit.state.path.length - 1].x,
-                        y: unit.state.path[unit.state.path.length - 1].y,
-                      },
-                      lookAt: {
-                        x: unit.state.path[unit.state.path.length - 1].x + 1,
-                        y: unit.state.path[unit.state.path.length - 1].y,
-                      },
-                    },
-                  }
-                : unit
-            ),
+            units: state.units
+              .map(
+                (unit): Unit =>
+                  isUnitDoneMoving(unit, action.payload.frame)
+                    ? {
+                        ...unit,
+                        state: {
+                          type: "stationary",
+                          position: {
+                            x: unit.state.path[unit.state.path.length - 1].x,
+                            y: unit.state.path[unit.state.path.length - 1].y,
+                          },
+                          lookAt: {
+                            x:
+                              unit.state.path[unit.state.path.length - 1].x + 1,
+                            y: unit.state.path[unit.state.path.length - 1].y,
+                          },
+                        },
+                      }
+                    : unit
+              )
+              .map((unit) => {
+                if (isUnitAnyActionCooldownReady(unit, action.payload.frame)) {
+                  return {
+                    ...unit,
+                    actions: unit.actions.map((unitAction) => {
+                      if (
+                        isUnitActionCooldownReady(
+                          unitAction,
+                          action.payload.frame
+                        )
+                      ) {
+                        return {
+                          ...unitAction,
+                          state: {
+                            type: "ready",
+                          },
+                        };
+                      }
+                      return unitAction;
+                    }),
+                  };
+                }
+                return unit;
+              }),
           }
         : state;
     }

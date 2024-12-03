@@ -4,7 +4,7 @@ import { Actions } from "../../api";
 import { useUserId } from "./use-user-id";
 
 export const useServer = () => {
-  const { userId, setUserId } = useUserId();
+  const { setUserId } = useUserId();
   const socketRef = useRef<WebSocket | null>(null);
   const eventEmitter = useMemo(() => new EventEmitter(), []);
 
@@ -41,7 +41,7 @@ export const useServer = () => {
         socket.send(JSON.stringify(data));
       }
     });
-  }, [eventEmitter, userId, setUserId]);
+  }, [eventEmitter, setUserId]);
 
   return eventEmitter;
 };

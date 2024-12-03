@@ -1,10 +1,12 @@
-import { useState } from "react";
+let globalUserId: string | undefined = undefined;
+
+const setUserId = (userId: string) => {
+  globalUserId = userId;
+};
 
 export const useUserId = () => {
-  const [userId, setUserId] = useState<string | null>(null);
-
   return {
-    userId,
+    userId: globalUserId,
     setUserId,
   };
 };
