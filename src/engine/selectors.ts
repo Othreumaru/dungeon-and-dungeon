@@ -1,4 +1,4 @@
-import type { Unit } from "../api.ts";
+import type { MovingUnit, Unit, UnitAction } from "../api.ts";
 import { normalize2D } from "../libs/math/vector/normalize.ts";
 
 export const getUnitPosition = (
@@ -50,7 +50,8 @@ export const getUnitPosition = (
     return lastFrame;
   }
   for (let i = 0; i < path.length - 1; i++) {
-    const pathDuration = (unit.state.endFrame - unit.state.startFrame) / path.length;
+    const pathDuration =
+      (unit.state.endFrame - unit.state.startFrame) / path.length;
     const iFrame = unit.state.startFrame + i * pathDuration;
     const nextFrame = unit.state.startFrame + (i + 1) * pathDuration;
     if (iFrame <= frame && nextFrame >= frame) {
@@ -74,3 +75,23 @@ export const getUnitPosition = (
     }
   }
 };
+
+export const isUnitDoneMoving = (
+  unit: Unit,
+  frame: number
+): unit is Unit & {
+  state: MovingUnit;
+} => unit.state.type === "moving" && unit.state.endFrame < frame;
+
+export const isAnyUnitDoneMoving = (units: Unit[], frame: number) =>
+  units.some((unit) => isUnitDoneMoving(unit, frame));
+
+export const isUnitActionCooldownReady = (
+  unitAction: UnitAction,
+  frame: number
+) => unitAction.state.type === "cooldown" && unitAction.state.endFrame < frame;
+
+export const isUnitAnyActionCooldownReady = (unit: Unit, frame: number) =>
+  unit.actions.some((unitAction) =>
+    isUnitActionCooldownReady(unitAction, frame)
+  );

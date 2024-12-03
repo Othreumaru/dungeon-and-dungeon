@@ -1,18 +1,19 @@
 import EventEmitter from "eventemitter3";
 import type { MoveAction, State, UnitSpawnAction } from "../../api.ts";
 import { aStarSolver } from "../../libs/a-star-solver/a-star-solver.ts";
+import { v4 as uuidv4 } from "uuid";
 
 export const tickHandler = (state: State, eventEmitter: EventEmitter) => {
   // console.log(eventEmitter);
   const countOfAIUnits = state.units.filter(
     (unit) => unit.controller.type === "ai"
   ).length;
-  if (countOfAIUnits === 0) {
+  if (countOfAIUnits <= 2) {
     const spawnAction: UnitSpawnAction = {
       type: "action:unit-spawn",
       payload: {
         unit: {
-          id: "1",
+          id: uuidv4(),
           color: "red",
           state: {
             type: "moving",
@@ -34,7 +35,15 @@ export const tickHandler = (state: State, eventEmitter: EventEmitter) => {
             endFrame: Date.now() + 2000,
           },
           model: "skeleton-minion",
-          actions: [],
+          actions: [
+            {
+              name: "move",
+              cooldownSec: 8,
+              state: {
+                type: "ready",
+              },
+            },
+          ],
           controller: {
             type: "ai",
             algorithm: {
@@ -60,7 +69,10 @@ export const tickHandler = (state: State, eventEmitter: EventEmitter) => {
           if (
             unit.controller.algorithm.state.type === "patrol" &&
             unit.state.type === "stationary" &&
-            unit.controller.algorithm.state.endFrame < Date.now()
+            unit.controller.algorithm.state.endFrame < Date.now() &&
+            unit.actions.some((action) => {
+              return action.name === "move" && action.state.type === "ready";
+            })
           ) {
             const randomPosition = {
               x: Math.floor(Math.random() * 9),
@@ -69,7 +81,7 @@ export const tickHandler = (state: State, eventEmitter: EventEmitter) => {
             const inputGrid: boolean[][] = [...Array(11)].map(() =>
               [...Array(11)].map(() => true)
             );
-            console.log(unit.state.position, randomPosition);
+
             const path = aStarSolver(
               inputGrid,
               { x: unit.state.position.x, y: unit.state.position.y },

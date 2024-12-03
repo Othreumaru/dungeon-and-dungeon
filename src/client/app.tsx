@@ -1,4 +1,5 @@
 import "./app.css";
+import { ActionToolbar } from "./components/action-toolbar/action-toolbar";
 import { ChatWindow } from "./components/chat-window/chat-window";
 import { GameViewport } from "./components/game-viewport/game-viewport";
 import { EngineContextProvider } from "./engine-context";
@@ -28,6 +29,7 @@ function App() {
       <EngineContextProvider>
         <GameViewport />
         <ChatWindow />
+        <ActionToolbar />
       </EngineContextProvider>
     </ServerContextProvider>
   );
