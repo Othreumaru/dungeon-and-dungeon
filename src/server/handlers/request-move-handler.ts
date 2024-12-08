@@ -1,18 +1,17 @@
-import EventEmitter from "eventemitter3";
-import type {
-  MoveAction,
-  MoveRequest,
-  ServerUpgradedRequest,
-  State,
-} from "../../api.ts";
+import type { MoveAction } from "../../api.ts";
+import type { EngineApi } from "../../engine/engine.ts";
 import { aStarSolver } from "../../libs/a-star-solver/a-star-solver.ts";
+import type { MoveRequest } from "../../protocol.ts";
+import type { PlayerContext, ServerApi } from "../server-api.ts";
 
 export const requestMoveHandler = (
-  data: ServerUpgradedRequest<MoveRequest>,
-  state: State,
-  eventEmitter: EventEmitter
+  data: MoveRequest,
+  playerContext: PlayerContext,
+  engineApi: EngineApi,
+  serverApi: ServerApi
 ) => {
-  const unitId = data.payload.session.userId;
+  const unitId = playerContext.userId;
+  const state = engineApi.getState();
   const unit = state.units.find((unit) => unit.id === unitId);
   if (!unit) {
     console.warn(`Unit "${unitId}" not found`);
@@ -42,5 +41,5 @@ export const requestMoveHandler = (
       endFrame: Date.now() + path.length * 200,
     },
   };
-  eventEmitter.emit("broadcast", action);
+  serverApi.broadcast(action);
 };

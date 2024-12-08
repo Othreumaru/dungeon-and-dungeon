@@ -90,48 +90,6 @@ export type State = {
   units: Unit[];
 };
 
-export type MoveRequest = {
-  type: "request:move";
-  payload: {
-    x: number;
-    y: number;
-  };
-};
-
-export type JoinRequest = {
-  type: "request:join";
-};
-
-export type LeaveRequest = {
-  type: "request:leave";
-};
-
-export type ChatRequest = {
-  type: "request:chat";
-  payload: {
-    message: string;
-  };
-};
-
-export type Requests = MoveRequest | ChatRequest;
-
-export type ServerUpgradedRequest<T> = T & {
-  payload: {
-    session: {
-      userId: string;
-      name: string;
-      email: string;
-      image: string;
-    };
-  };
-};
-
-export type ServerUpgradedRequests =
-  | ServerUpgradedRequest<JoinRequest>
-  | ServerUpgradedRequest<MoveRequest>
-  | ServerUpgradedRequest<LeaveRequest>
-  | ServerUpgradedRequest<ChatRequest>;
-
 export type SyncAction = {
   type: "action:sync";
   payload: {

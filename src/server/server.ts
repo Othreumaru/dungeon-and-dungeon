@@ -1,26 +1,23 @@
-import EventEmitter from "eventemitter3";
 import WebSocket, { WebSocketServer } from "ws";
-import type {
-  JoinRequest,
-  LeaveRequest,
-  ServerUpgradedRequest,
-  ServerUpgradedRequests,
-} from "../api.ts";
+import type { Actions, FrameTickAction } from "../api.ts";
 import express from "express";
 import type { Request } from "express";
 import { ExpressAuth } from "@auth/express";
 import type { ExpressAuthConfig } from "@auth/express";
 import GitHub from "@auth/express/providers/github";
-import type { IncomingMessage } from "http";
+import { type IncomingMessage } from "http";
 import { getSession } from "@auth/express";
 import crypto from "crypto";
+import { ClientRequests } from "../protocol.ts";
+import { requestMoveHandler } from "./handlers/request-move-handler.ts";
+import type { EngineApi } from "../engine/engine.ts";
+import { requestJoinHandler } from "./handlers/request-join-handler.ts";
+import type { PlayerContext, ServerApi, Session } from "./server-api.ts";
+import { requestChatHandler } from "./handlers/request-chat-handler.ts";
+import { requestLeaveHandler } from "./handlers/request-leave-handler.ts";
+import { tickHandler } from "./handlers/tick-handler.ts";
 
-type Session = {
-  name: string;
-  email: string;
-  image: string;
-};
-type UpgradedWebSocket = WebSocket & { session: Session };
+type UpgradedWebSocket = WebSocket & PlayerContext;
 
 const hashStr = (str: string) => {
   const hash = crypto.createHash("md5").update(str).digest("hex");
@@ -29,7 +26,7 @@ const hashStr = (str: string) => {
 
 const expressAuthConfig: ExpressAuthConfig = { providers: [GitHub] };
 
-export const initServer = (eventEmitter: EventEmitter) => {
+export const initServer = (engineApi: EngineApi) => {
   const app = express();
   app.set("trust proxy", true);
   app.use(express.static("dist"));
@@ -41,7 +38,8 @@ export const initServer = (eventEmitter: EventEmitter) => {
 
   const wss = new WebSocketServer({ noServer: true });
 
-  eventEmitter.on("broadcast", (data) => {
+  const broadcast = (data: Actions) => {
+    engineApi.applyAction(data, false);
     const buffer = JSON.stringify(data);
     console.log("broadcasting", buffer);
     wss.clients.forEach((client) => {
@@ -49,70 +47,69 @@ export const initServer = (eventEmitter: EventEmitter) => {
         client.send(buffer);
       }
     });
-  });
+  };
+
+  const send = (userId: string, data: Actions) => {
+    const buffer = JSON.stringify(data);
+    console.log("sending", buffer);
+    wss.clients.forEach((client) => {
+      if (
+        client.readyState === WebSocket.OPEN &&
+        (client as UpgradedWebSocket).userId === userId
+      ) {
+        client.send(buffer);
+      }
+    });
+  };
+
+  const serverApi: ServerApi = {
+    broadcast,
+    send,
+  };
+
+  engineApi.onDispatch(broadcast);
+
+  setInterval(() => {
+    tickHandler(engineApi, serverApi);
+    const tickAction: FrameTickAction = {
+      type: "action:frame-tick",
+      payload: { frame: Date.now() },
+    };
+    engineApi.applyAction(tickAction, false);
+  }, 100);
 
   wss.on("connection", (ws) => {
     const session = (ws as UpgradedWebSocket).session;
     const userId = hashStr(session.email + session.name);
+    const playerContext = { session, userId };
+    (ws as UpgradedWebSocket).userId = userId;
 
-    eventEmitter.on(`message:${userId}`, (data) => {
-      ws.send(JSON.stringify(data));
-    });
-
-    const joinRequest: ServerUpgradedRequest<JoinRequest> = {
-      type: "request:join",
-      payload: {
-        session: {
-          userId,
-          name: session.name,
-          image: session.image,
-          email: session.email,
-        },
-      },
-    };
-
-    eventEmitter.emit("message", joinRequest);
+    requestJoinHandler(playerContext, engineApi, serverApi);
 
     ws.on("error", console.error);
 
-    ws.on("message", (data) => {
-      const request: ServerUpgradedRequests = JSON.parse(data.toString());
-      if (request.type === "request:chat") {
-        eventEmitter.emit("broadcast", {
-          type: "action:chat",
-          payload: {
-            userId: (ws as unknown as { userId: string }).userId,
-            message: request.payload.message,
-          },
-        });
+    ws.on("message", (data: string) => {
+      const parsedRequest = ClientRequests.safeParse(
+        JSON.parse(data.toString())
+      );
+      if (!parsedRequest.success) {
+        console.error(parsedRequest.error);
+        console.error("Invalid request", data.toString());
+        return;
       }
 
-      if (request.type !== "request:join") {
-        eventEmitter.emit("message", {
-          ...request,
-          payload: {
-            ...request.payload,
-            session: {
-              userId,
-              ...session,
-            },
-          },
-        });
+      const request = parsedRequest.data;
+
+      if (request.type === "request:chat") {
+        requestChatHandler(request, playerContext, engineApi, serverApi);
+      }
+      if (request.type === "request:move") {
+        requestMoveHandler(request, playerContext, engineApi, serverApi);
       }
     });
 
     ws.on("close", () => {
-      const leaveRequest: ServerUpgradedRequest<LeaveRequest> = {
-        type: "request:leave",
-        payload: {
-          session: {
-            userId,
-            ...session,
-          },
-        },
-      };
-      eventEmitter.emit("message", leaveRequest);
-      eventEmitter.removeAllListeners(`message:${userId}`);
+      requestLeaveHandler(playerContext, engineApi, serverApi);
     });
   });
 

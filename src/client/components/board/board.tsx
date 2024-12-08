@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { useEffect, useRef } from "react";
 import { useServerContext } from "../../hooks/use-server-context";
-import { MoveRequest } from "../../../api";
+import { emitMoveRequest } from "../../../protocol";
 
 export const Board = ({
   count = 100,
@@ -56,13 +56,11 @@ export const Board = ({
           boxRef.current?.position.set(event.point.x, 0.1, event.point.z);
         }}
         onPointerUp={(event) => {
-          eventEmitter.emit("request", {
-            type: "request:move",
-            payload: {
-              x: Math.floor(event.intersections[0].point.x),
-              y: Math.floor(event.intersections[0].point.z),
-            },
-          } satisfies MoveRequest);
+          emitMoveRequest(
+            eventEmitter,
+            Math.floor(event.intersections[0].point.x),
+            Math.floor(event.intersections[0].point.z)
+          );
         }}
         position={[5, 0.1, 5]}
         rotation-x={-Math.PI / 2}

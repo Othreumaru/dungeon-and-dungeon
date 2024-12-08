@@ -1,10 +1,11 @@
-import EventEmitter from "eventemitter3";
-import type { MoveAction, State, UnitSpawnAction } from "../../api.ts";
+import type { MoveAction, UnitSpawnAction } from "../../api.ts";
+import type { EngineApi } from "../../engine/engine.ts";
 import { aStarSolver } from "../../libs/a-star-solver/a-star-solver.ts";
 import { v4 as uuidv4 } from "uuid";
+import type { ServerApi } from "../server-api.ts";
 
-export const tickHandler = (state: State, eventEmitter: EventEmitter) => {
-  // console.log(eventEmitter);
+export const tickHandler = (engineApi: EngineApi, serverApi: ServerApi) => {
+  const state = engineApi.getState();
   const countOfAIUnits = state.units.filter(
     (unit) => unit.controller.type === "ai"
   ).length;
@@ -59,7 +60,7 @@ export const tickHandler = (state: State, eventEmitter: EventEmitter) => {
         },
       },
     };
-    eventEmitter.emit("broadcast", spawnAction);
+    serverApi.broadcast(spawnAction);
     return;
   }
   state.units.forEach((unit) => {
@@ -96,7 +97,7 @@ export const tickHandler = (state: State, eventEmitter: EventEmitter) => {
                 path,
               },
             };
-            eventEmitter.emit("broadcast", action);
+            serverApi.broadcast(action);
           }
           break;
         }
