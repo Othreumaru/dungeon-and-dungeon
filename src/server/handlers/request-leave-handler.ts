@@ -1,4 +1,4 @@
-import type { UnitDespawnAction } from "../../api.ts";
+import type { UnitDespawnAction } from "../../protocol/actions.ts";
 import type { PlayerContext, ServerApi } from "../server-api.ts";
 import type { EngineApi } from "../../engine/engine.ts";
 

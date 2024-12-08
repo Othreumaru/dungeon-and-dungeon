@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import EventEmitter from "eventemitter3";
-import { Actions } from "../../api";
+import { Actions } from "../../protocol/actions";
 import { useUserId } from "./use-user-id";
 
 export const useServer = () => {

@@ -1,4 +1,4 @@
-import type { ChatAction } from "../../api.ts";
+import type { ChatAction } from "../../protocol/actions.ts";
 import type { EngineApi } from "../../engine/engine.ts";
 import type { ChatRequest } from "../../protocol/requests.ts";
 import type { PlayerContext, ServerApi } from "../server-api.ts";

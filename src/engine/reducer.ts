@@ -1,4 +1,4 @@
-import type { Actions } from "../api.ts";
+import type { Actions } from "../protocol/actions.ts";
 import type { State, Unit } from "../protocol/state.ts";
 import {
   isAnyUnitDoneMoving,

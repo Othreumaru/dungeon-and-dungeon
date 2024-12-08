@@ -1,5 +1,5 @@
 import WebSocket, { WebSocketServer } from "ws";
-import type { Actions, FrameTickAction } from "../api.ts";
+import type { Actions, FrameTickAction } from "../protocol/actions.ts";
 import express from "express";
 import type { Request } from "express";
 import { ExpressAuth } from "@auth/express";

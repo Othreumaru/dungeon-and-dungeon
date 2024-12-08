@@ -1,4 +1,4 @@
-import type { MoveAction, UnitSpawnAction } from "../../api.ts";
+import type { MoveAction, UnitSpawnAction } from "../../protocol/actions.ts";
 import type { EngineApi } from "../../engine/engine.ts";
 import { aStarSolver } from "../../libs/a-star-solver/a-star-solver.ts";
 import { v4 as uuidv4 } from "uuid";

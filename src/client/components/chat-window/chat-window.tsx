@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import "./chat-window.css";
 import { useServerContext } from "../../hooks/use-server-context";
-import { Actions } from "../../../api";
+import { Actions } from "../../../protocol/actions";
 import { EngineContext } from "../../engine-context";
 import { emitChatRequest } from "../../../protocol/requests";
 
