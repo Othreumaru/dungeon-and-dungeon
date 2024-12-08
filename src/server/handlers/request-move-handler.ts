@@ -1,4 +1,4 @@
-import type { MoveAction } from "../../protocol/actions.ts";
+import { createMoveAction } from "../../protocol/actions.ts";
 import type { EngineApi } from "../../engine/engine.ts";
 import { aStarSolver } from "../../libs/a-star-solver/a-star-solver.ts";
 import type { MoveRequest } from "../../protocol/requests.ts";
@@ -29,17 +29,14 @@ export const requestMoveHandler = (
     { x: unit.state.position.x, y: unit.state.position.y },
     { x: data.payload.x, y: data.payload.y }
   );
-  const action: MoveAction = {
-    type: "action:move",
-    payload: {
-      path: path.map((point) => ({
-        x: point.x,
-        y: point.y,
-      })),
-      unitId: unitId,
-      startFrame: Date.now(),
-      endFrame: Date.now() + path.length * 200,
-    },
-  };
+  const action = createMoveAction(
+    unitId,
+    Date.now(),
+    Date.now() + path.length * 200,
+    path.map((point) => ({
+      x: point.x,
+      y: point.y,
+    }))
+  );
   serverApi.broadcast(action);
 };

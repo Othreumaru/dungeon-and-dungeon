@@ -111,3 +111,54 @@ export type Unit = z.infer<typeof Unit>;
 export type MovingUnit = z.infer<typeof MovingUnit>;
 export type StationaryUnit = z.infer<typeof StationaryUnit>;
 export type UnitAction = z.infer<typeof UnitAction>;
+export type UnitController = z.infer<typeof UnitController>;
+export type UnitState = z.infer<typeof UnitState>;
+
+const defaultUnitColor = "red";
+const defaultUnitModel = "skeleton-minion";
+const defaultUnitController: UnitController = {
+  type: "player",
+};
+const defaultUnitActions: UnitAction[] = [
+  {
+    name: "move",
+    cooldownSec: 8,
+    state: {
+      type: "ready",
+    },
+  },
+];
+const defaultUnitState: StationaryUnit = {
+  type: "stationary",
+  position: {
+    x: 0,
+    y: 0,
+  },
+  lookAt: {
+    x: 0,
+    y: 1,
+  },
+};
+
+export const createUnit = ({
+  id,
+  color = defaultUnitColor,
+  model = defaultUnitModel,
+  controller = defaultUnitController,
+  actions = defaultUnitActions,
+  state = defaultUnitState,
+}: {
+  id: string;
+  color?: string;
+  model?: string;
+  controller?: UnitController;
+  actions?: UnitAction[];
+  state?: UnitState;
+}): Unit => ({
+  id,
+  color,
+  model,
+  controller,
+  actions,
+  state,
+});

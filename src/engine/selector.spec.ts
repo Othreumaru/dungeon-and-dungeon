@@ -1,11 +1,11 @@
 import { describe, it } from "node:test";
 import { getUnitPosition } from "./selectors.ts";
 import { deepStrictEqual } from "node:assert";
-import type { Unit } from "../protocol/state.ts";
+import { createUnit } from "../protocol/state.ts";
 
 describe("getUnitPosition", () => {
   it("should return stationary unit", () => {
-    const unit: Unit = {
+    const unit = createUnit({
       id: "1",
       state: {
         type: "stationary",
@@ -18,11 +18,7 @@ describe("getUnitPosition", () => {
           y: 20,
         },
       },
-      color: "blue",
-      actions: [],
-      model: "skeleton-minion",
-      controller: { type: "player" },
-    };
+    });
 
     const result = getUnitPosition(unit, 0);
     deepStrictEqual(result?.position.x, 10);
@@ -32,7 +28,7 @@ describe("getUnitPosition", () => {
   });
 
   it("should return undefined if path is empty", () => {
-    const unit: Unit = {
+    const unit = createUnit({
       id: "1",
       state: {
         type: "moving",
@@ -40,17 +36,13 @@ describe("getUnitPosition", () => {
         startFrame: 100,
         endFrame: 200,
       },
-      color: "blue",
-      actions: [],
-      model: "skeleton-minion",
-      controller: { type: "player" },
-    };
+    });
     const result = getUnitPosition(unit, 0);
     deepStrictEqual(result, undefined);
   });
 
   it("should return first path point if frame is before first frame", () => {
-    const unit: Unit = {
+    const unit = createUnit({
       id: "1",
       state: {
         type: "moving",
@@ -63,11 +55,7 @@ describe("getUnitPosition", () => {
         startFrame: 100,
         endFrame: 200,
       },
-      actions: [],
-      color: "blue",
-      model: "skeleton-minion",
-      controller: { type: "player" },
-    };
+    });
     const result = getUnitPosition(unit, 50);
     deepStrictEqual(result?.position.x, 10);
     deepStrictEqual(result?.position.y, 20);
@@ -76,7 +64,7 @@ describe("getUnitPosition", () => {
   });
 
   it("should return last path point if frame is after last frame", () => {
-    const state: Unit = {
+    const state = createUnit({
       id: "1",
       state: {
         type: "moving",
@@ -93,11 +81,7 @@ describe("getUnitPosition", () => {
         startFrame: 100,
         endFrame: 200,
       },
-      actions: [],
-      color: "blue",
-      model: "skeleton-minion",
-      controller: { type: "player" },
-    };
+    });
     const result = getUnitPosition(state, 250);
     deepStrictEqual(result?.position.x, 10);
     deepStrictEqual(result?.position.y, 21);
@@ -106,7 +90,7 @@ describe("getUnitPosition", () => {
   });
 
   it("should interpolate position", () => {
-    const state: Unit = {
+    const state = createUnit({
       id: "1",
       state: {
         type: "moving",
@@ -123,11 +107,7 @@ describe("getUnitPosition", () => {
         startFrame: 100,
         endFrame: 200,
       },
-      actions: [],
-      color: "blue",
-      model: "skeleton-minion",
-      controller: { type: "player" },
-    };
+    });
     const result = getUnitPosition(state, 150);
     deepStrictEqual(result?.position.x, 10);
     deepStrictEqual(result?.position.y, 20);

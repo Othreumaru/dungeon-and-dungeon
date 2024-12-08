@@ -1,5 +1,5 @@
 import WebSocket, { WebSocketServer } from "ws";
-import type { Actions, FrameTickAction } from "../protocol/actions.ts";
+import { createFrameTickAction, type Actions } from "../protocol/actions.ts";
 import express from "express";
 import type { Request } from "express";
 import { ExpressAuth } from "@auth/express";
@@ -71,11 +71,7 @@ export const initServer = (engineApi: EngineApi) => {
 
   setInterval(() => {
     tickHandler(engineApi, serverApi);
-    const tickAction: FrameTickAction = {
-      type: "action:frame-tick",
-      payload: { frame: Date.now() },
-    };
-    engineApi.applyAction(tickAction, false);
+    engineApi.applyAction(createFrameTickAction(Date.now()), false);
   }, 100);
 
   wss.on("connection", (ws) => {

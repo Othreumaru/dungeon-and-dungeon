@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { State, Unit } from "./state";
+import { State, Unit } from "./state.ts";
 
 export const SyncAction = z.object({
   type: z.literal("action:sync"),
@@ -9,7 +9,7 @@ export const SyncAction = z.object({
   }),
 });
 
-export const MoveAction = z.object({
+const MoveAction = z.object({
   type: z.literal("action:move"),
   payload: z.object({
     unitId: z.string(),
@@ -24,7 +24,7 @@ export const MoveAction = z.object({
   }),
 });
 
-export const ChatAction = z.object({
+const ChatAction = z.object({
   type: z.literal("action:chat"),
   payload: z.object({
     userId: z.string(),
@@ -32,28 +32,28 @@ export const ChatAction = z.object({
   }),
 });
 
-export const FrameTickAction = z.object({
+const FrameTickAction = z.object({
   type: z.literal("action:frame-tick"),
   payload: z.object({
     frame: z.number(),
   }),
 });
 
-export const UnitSpawnAction = z.object({
+const UnitSpawnAction = z.object({
   type: z.literal("action:unit-spawn"),
   payload: z.object({
     unit: Unit,
   }),
 });
 
-export const UnitDespawnAction = z.object({
+const UnitDespawnAction = z.object({
   type: z.literal("action:unit-despawn"),
   payload: z.object({
     unitId: z.string(),
   }),
 });
 
-export const Actions = z.union([
+const Actions = z.union([
   SyncAction,
   MoveAction,
   ChatAction,
@@ -62,10 +62,66 @@ export const Actions = z.union([
   UnitDespawnAction,
 ]);
 
+type SyncAction = z.infer<typeof SyncAction>;
+type MoveAction = z.infer<typeof MoveAction>;
+type ChatAction = z.infer<typeof ChatAction>;
+type FrameTickAction = z.infer<typeof FrameTickAction>;
+type UnitSpawnAction = z.infer<typeof UnitSpawnAction>;
+type UnitDespawnAction = z.infer<typeof UnitDespawnAction>;
+
 export type Actions = z.infer<typeof Actions>;
-export type SyncAction = z.infer<typeof SyncAction>;
-export type MoveAction = z.infer<typeof MoveAction>;
-export type ChatAction = z.infer<typeof ChatAction>;
-export type FrameTickAction = z.infer<typeof FrameTickAction>;
-export type UnitSpawnAction = z.infer<typeof UnitSpawnAction>;
-export type UnitDespawnAction = z.infer<typeof UnitDespawnAction>;
+
+export const createSyncAction = (userId: string, state: State): SyncAction => ({
+  type: "action:sync",
+  payload: {
+    userId,
+    state,
+  },
+});
+
+export const createMoveAction = (
+  unitId: string,
+  startFrame: number,
+  endFrame: number,
+  path: { x: number; y: number }[]
+): MoveAction => ({
+  type: "action:move",
+  payload: {
+    unitId,
+    startFrame,
+    endFrame,
+    path,
+  },
+});
+
+export const createFrameTickAction = (frame: number): FrameTickAction => ({
+  type: "action:frame-tick",
+  payload: {
+    frame,
+  },
+});
+
+export const createUnitSpawnAction = (unit: Unit): UnitSpawnAction => ({
+  type: "action:unit-spawn",
+  payload: {
+    unit,
+  },
+});
+
+export const createChatAction = (
+  userId: string,
+  message: string
+): ChatAction => ({
+  type: "action:chat",
+  payload: {
+    userId,
+    message,
+  },
+});
+
+export const createUnitDespawnAction = (unitId: string): UnitDespawnAction => ({
+  type: "action:unit-despawn",
+  payload: {
+    unitId,
+  },
+});
