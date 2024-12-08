@@ -1,7 +1,7 @@
 import { DemoScene } from "../demo-scene/demo-scene";
 import { Unit } from "./unit";
 import { StoryFn } from "@storybook/react";
-import { Unit as UnitType } from "../../../api";
+import { Unit as UnitType } from "../../../protocol/state";
 
 export default {
   title: "molecule/Unit",

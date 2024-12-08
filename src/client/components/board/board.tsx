@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { useEffect, useRef } from "react";
 import { useServerContext } from "../../hooks/use-server-context";
-import { emitMoveRequest } from "../../../protocol";
+import { emitMoveRequest } from "../../../protocol/requests";
 
 export const Board = ({
   count = 100,

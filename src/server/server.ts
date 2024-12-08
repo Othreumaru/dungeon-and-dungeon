@@ -8,7 +8,6 @@ import GitHub from "@auth/express/providers/github";
 import { type IncomingMessage } from "http";
 import { getSession } from "@auth/express";
 import crypto from "crypto";
-import { ClientRequests } from "../protocol.ts";
 import { requestMoveHandler } from "./handlers/request-move-handler.ts";
 import type { EngineApi } from "../engine/engine.ts";
 import { requestJoinHandler } from "./handlers/request-join-handler.ts";
@@ -16,6 +15,7 @@ import type { PlayerContext, ServerApi, Session } from "./server-api.ts";
 import { requestChatHandler } from "./handlers/request-chat-handler.ts";
 import { requestLeaveHandler } from "./handlers/request-leave-handler.ts";
 import { tickHandler } from "./handlers/tick-handler.ts";
+import { ClientRequests } from "../protocol/requests.ts";
 
 type UpgradedWebSocket = WebSocket & PlayerContext;
 

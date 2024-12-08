@@ -1,7 +1,8 @@
 import { createContext, useEffect, useReducer } from "react";
 import { reducer, initialState } from "../engine/reducer.ts";
-import { State, Actions } from "../api";
+import type { Actions } from "../api";
 import { useServerContext } from "./hooks/use-server-context.ts";
+import type { State } from "../protocol/state.ts";
 
 export const EngineContext = createContext<State>(null as unknown as State);
 export const EngineDispatchContext = createContext<(action: Actions) => void>(

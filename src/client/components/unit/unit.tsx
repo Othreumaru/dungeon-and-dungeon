@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
-import { MovingUnit, StationaryUnit, Unit as UnitType } from "../../../api";
+import {
+  MovingUnit,
+  StationaryUnit,
+  Unit as UnitType,
+} from "../../../protocol/state";
 import { Mage, MageApi } from "../mage/mage";
 import { useFrame } from "@react-three/fiber";
 import { easing } from "maath";

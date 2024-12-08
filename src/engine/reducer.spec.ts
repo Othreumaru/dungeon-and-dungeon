@@ -2,7 +2,7 @@ import { describe, it } from "node:test";
 import { reducer, initialState } from "./reducer.ts";
 import type { FrameTickAction, MoveAction, Actions } from "../api.ts";
 import { deepStrictEqual } from "node:assert";
-import type { State } from "../api.ts";
+import type { State } from "../protocol/state.ts";
 
 describe("reducer", () => {
   it("should return the initial state", () => {
