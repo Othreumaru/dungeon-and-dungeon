@@ -1,4 +1,4 @@
-import type { SyncAction, UnitSpawnAction } from "../../api.ts";
+import type { SyncAction, UnitSpawnAction } from "../../protocol/actions.ts";
 import type { PlayerContext, ServerApi } from "../server-api.ts";
 import type { EngineApi } from "../../engine/engine.ts";
 

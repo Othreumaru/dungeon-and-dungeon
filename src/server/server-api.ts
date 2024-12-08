@@ -1,4 +1,4 @@
-import type { Actions } from "../api";
+import type { Actions } from "../protocol/actions.ts";
 
 export type ServerApi = {
   broadcast: (action: Actions) => void;

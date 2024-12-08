@@ -1,4 +1,4 @@
-import type { MoveAction } from "../../api.ts";
+import type { MoveAction } from "../../protocol/actions.ts";
 import type { EngineApi } from "../../engine/engine.ts";
 import { aStarSolver } from "../../libs/a-star-solver/a-star-solver.ts";
 import type { MoveRequest } from "../../protocol/requests.ts";
