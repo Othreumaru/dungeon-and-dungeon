@@ -1,6 +1,6 @@
 import { createContext, useEffect, useReducer } from "react";
 import { reducer, initialState } from "../engine/reducer.ts";
-import type { Actions } from "../protocol/actions.ts";
+import { createFrameTickAction, type Actions } from "../protocol/actions.ts";
 import { useServerContext } from "./hooks/use-server-context.ts";
 import type { State } from "../protocol/state.ts";
 
@@ -20,7 +20,7 @@ export const EngineContextProvider = ({
   useEffect(() => {
     eventEmitter.on("message", dispatch);
     const intervalTimer = setInterval(() => {
-      dispatch({ type: "action:frame-tick", payload: { frame: Date.now() } });
+      dispatch(createFrameTickAction(Date.now()));
     }, 100);
     return () => {
       clearInterval(intervalTimer);

@@ -1,6 +1,10 @@
-import type { SyncAction, UnitSpawnAction } from "../../protocol/actions.ts";
+import {
+  createSyncAction,
+  createUnitSpawnAction,
+} from "../../protocol/actions.ts";
 import type { PlayerContext, ServerApi } from "../server-api.ts";
 import type { EngineApi } from "../../engine/engine.ts";
+import { createUnit } from "../../protocol/state.ts";
 
 const colors = [
   "blue",
@@ -34,42 +38,23 @@ export const requestJoinHandler = (
 ) => {
   const state = engineApi.getState();
   const userId = playerContext.userId;
-  const syncAction: SyncAction = {
-    type: "action:sync",
-    payload: {
-      userId,
-      state,
-    },
-  };
+  const syncAction = createSyncAction(userId, state);
   const randomPosition = {
     x: Math.floor(Math.random() * 9),
     y: Math.floor(Math.random() * 9),
   };
-  const spawnAction: UnitSpawnAction = {
-    type: "action:unit-spawn",
-    payload: {
-      unit: {
-        id: userId,
-        state: {
-          type: "stationary",
-          position: randomPosition,
-          lookAt: { x: randomPosition.x, y: randomPosition.y - 1 },
-        },
-        controller: { type: "player" },
-        model: "mage",
-        actions: [
-          {
-            name: "move",
-            cooldownSec: 8,
-            state: {
-              type: "ready",
-            },
-          },
-        ],
-        color: colors[Math.floor(Math.random() * colors.length)],
+  const spawnAction = createUnitSpawnAction(
+    createUnit({
+      id: userId,
+      state: {
+        type: "stationary",
+        position: randomPosition,
+        lookAt: { x: randomPosition.x, y: randomPosition.y - 1 },
       },
-    },
-  };
+      model: "mage",
+      color: colors[Math.floor(Math.random() * colors.length)],
+    })
+  );
   serverApi.send(userId, syncAction);
   serverApi.broadcast(spawnAction);
 };
