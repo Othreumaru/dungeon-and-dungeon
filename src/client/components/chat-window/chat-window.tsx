@@ -3,7 +3,7 @@ import "./chat-window.css";
 import { useServerContext } from "../../hooks/use-server-context";
 import { Actions } from "../../../api";
 import { EngineContext } from "../../engine-context";
-import { emitChatRequest } from "../../../protocol";
+import { emitChatRequest } from "../../../protocol/requests";
 
 export function ChatWindow() {
   const eventEmitter = useServerContext();

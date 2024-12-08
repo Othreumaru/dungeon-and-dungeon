@@ -1,7 +1,7 @@
 import { describe, it } from "node:test";
 import { getUnitPosition } from "./selectors.ts";
 import { deepStrictEqual } from "node:assert";
-import type { Unit } from "../api.ts";
+import type { Unit } from "../protocol/state.ts";
 
 describe("getUnitPosition", () => {
   it("should return stationary unit", () => {

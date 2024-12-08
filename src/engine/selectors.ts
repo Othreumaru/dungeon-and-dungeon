@@ -1,4 +1,4 @@
-import type { MovingUnit, Unit, UnitAction } from "../api.ts";
+import type { MovingUnit, Unit, UnitAction } from "../protocol/state.ts";
 import { normalize2D } from "../libs/math/vector/normalize.ts";
 
 export const getUnitPosition = (

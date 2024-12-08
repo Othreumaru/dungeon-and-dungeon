@@ -1,5 +1,5 @@
-import type { Actions, Unit } from "../api.ts";
-import type { State } from "../api.ts";
+import type { Actions } from "../api.ts";
+import type { State, Unit } from "../protocol/state.ts";
 import {
   isAnyUnitDoneMoving,
   isUnitActionCooldownReady,

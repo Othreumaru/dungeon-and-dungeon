@@ -1,7 +1,7 @@
-import type { ChatAction } from "../../api";
-import type { EngineApi } from "../../engine/engine";
-import type { ChatRequest } from "../../protocol";
-import type { PlayerContext, ServerApi } from "../server-api";
+import type { ChatAction } from "../../api.ts";
+import type { EngineApi } from "../../engine/engine.ts";
+import type { ChatRequest } from "../../protocol/requests.ts";
+import type { PlayerContext, ServerApi } from "../server-api.ts";
 
 export const requestChatHandler = (
   request: ChatRequest,

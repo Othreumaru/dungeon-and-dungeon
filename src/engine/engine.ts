@@ -1,6 +1,7 @@
 import EventEmitter from "eventemitter3";
-import type { Actions, State } from "../api.ts";
+import type { Actions } from "../api.ts";
 import { initialState, reducer } from "./reducer.ts";
+import type { State } from "../protocol/state.ts";
 
 export type EngineApi = {
   applyAction: (action: Actions, emit: boolean) => void;
