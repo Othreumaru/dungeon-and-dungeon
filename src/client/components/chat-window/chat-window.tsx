@@ -1,8 +1,9 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import "./chat-window.css";
 import { useServerContext } from "../../hooks/use-server-context";
-import { Actions, ChatRequest } from "../../../api";
+import { Actions } from "../../../api";
 import { EngineContext } from "../../engine-context";
+import { emitChatRequest } from "../../../protocol";
 
 export function ChatWindow() {
   const eventEmitter = useServerContext();
@@ -59,11 +60,7 @@ export function ChatWindow() {
             placeholder="Type a message..."
             onKeyUp={(event) => {
               if (event.key === "Enter") {
-                const chatRequest: ChatRequest = {
-                  type: "request:chat",
-                  payload: { message: event.currentTarget.value },
-                };
-                eventEmitter.emit("request", chatRequest);
+                emitChatRequest(eventEmitter, event.currentTarget.value);
               }
             }}
           />

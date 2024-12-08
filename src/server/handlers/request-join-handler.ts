@@ -1,11 +1,6 @@
-import type {
-  JoinRequest,
-  ServerUpgradedRequest,
-  State,
-  SyncAction,
-  UnitSpawnAction,
-} from "../../api.ts";
-import EventEmitter from "eventemitter3";
+import type { SyncAction, UnitSpawnAction } from "../../api.ts";
+import type { PlayerContext, ServerApi } from "../server-api.ts";
+import type { EngineApi } from "../../engine/engine.ts";
 
 const colors = [
   "blue",
@@ -33,11 +28,12 @@ const colors = [
 ];
 
 export const requestJoinHandler = (
-  data: ServerUpgradedRequest<JoinRequest>,
-  state: State,
-  eventEmitter: EventEmitter
+  playerContext: PlayerContext,
+  engineApi: EngineApi,
+  serverApi: ServerApi
 ) => {
-  const userId = data.payload.session.userId;
+  const state = engineApi.getState();
+  const userId = playerContext.userId;
   const syncAction: SyncAction = {
     type: "action:sync",
     payload: {
@@ -74,6 +70,6 @@ export const requestJoinHandler = (
       },
     },
   };
-  eventEmitter.emit(`message:${userId}`, syncAction);
-  eventEmitter.emit("broadcast", spawnAction);
+  serverApi.send(userId, syncAction);
+  serverApi.broadcast(spawnAction);
 };
