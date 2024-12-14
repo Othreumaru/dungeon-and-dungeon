@@ -1,8 +1,12 @@
-import type { MoveAction, UnitSpawnAction } from "../../protocol/actions.ts";
+import {
+  createMoveAction,
+  createUnitSpawnAction,
+} from "../../protocol/actions.ts";
 import type { EngineApi } from "../../engine/engine.ts";
 import { aStarSolver } from "../../libs/a-star-solver/a-star-solver.ts";
 import { v4 as uuidv4 } from "uuid";
 import type { ServerApi } from "../server-api.ts";
+import { createUnit } from "../../protocol/state.ts";
 
 export const tickHandler = (engineApi: EngineApi, serverApi: ServerApi) => {
   const state = engineApi.getState();
@@ -10,56 +14,35 @@ export const tickHandler = (engineApi: EngineApi, serverApi: ServerApi) => {
     (unit) => unit.controller.type === "ai"
   ).length;
   if (countOfAIUnits <= 2) {
-    const spawnAction: UnitSpawnAction = {
-      type: "action:unit-spawn",
-      payload: {
-        unit: {
-          id: uuidv4(),
-          color: "red",
-          state: {
-            type: "moving",
-            path: [
-              {
-                x: 10,
-                y: 0,
-              },
-              {
-                x: 10,
-                y: 1,
-              },
-              {
-                x: 10,
-                y: 2,
-              },
-            ],
-            startFrame: Date.now(),
-            endFrame: Date.now() + 2000,
+    const spawnAction = createUnitSpawnAction(
+      createUnit({
+        id: uuidv4(),
+        state: {
+          type: "stationary",
+          position: {
+            x: Math.floor(Math.random() * 9),
+            y: Math.floor(Math.random() * 9),
           },
-          model: "skeleton-minion",
-          actions: [
-            {
-              name: "move",
-              cooldownSec: 8,
-              state: {
-                type: "ready",
-              },
-            },
-          ],
-          controller: {
-            type: "ai",
-            algorithm: {
-              type: "patrol-and-attack",
-              attackRange: 10,
-              state: {
-                type: "patrol",
-                startFrame: Date.now(),
-                endFrame: Date.now() + 2000,
-              },
+          lookAt: {
+            x: 1,
+            y: 0,
+          },
+        },
+        controller: {
+          type: "ai",
+          algorithm: {
+            type: "patrol-and-attack",
+            attackRange: 10,
+            state: {
+              type: "patrol",
+              startFrame: Date.now(),
+              endFrame: Date.now() + 2000,
             },
           },
         },
-      },
-    };
+      })
+    );
+
     serverApi.broadcast(spawnAction);
     return;
   }
@@ -88,15 +71,12 @@ export const tickHandler = (engineApi: EngineApi, serverApi: ServerApi) => {
               { x: unit.state.position.x, y: unit.state.position.y },
               randomPosition
             );
-            const action: MoveAction = {
-              type: "action:move",
-              payload: {
-                unitId: unit.id,
-                startFrame: Date.now(),
-                endFrame: Date.now() + 200 * path.length,
-                path,
-              },
-            };
+            const action = createMoveAction(
+              unit.id,
+              Date.now(),
+              Date.now() + 200 * path.length,
+              path
+            );
             serverApi.broadcast(action);
           }
           break;

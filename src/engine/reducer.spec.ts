@@ -1,9 +1,9 @@
 import { describe, it } from "node:test";
 import { reducer, initialState } from "./reducer.ts";
-import type {
-  FrameTickAction,
-  MoveAction,
-  Actions,
+import {
+  createFrameTickAction,
+  type Actions,
+  createMoveAction,
 } from "../protocol/actions.ts";
 import { deepStrictEqual } from "node:assert";
 import type { State } from "../protocol/state.ts";
@@ -55,20 +55,12 @@ describe("reducer", () => {
       ],
     };
 
-    const moveAction: MoveAction = {
-      type: "action:move",
-      payload: {
-        unitId: "1",
-        path: [
-          {
-            x: 10,
-            y: 20,
-          },
-        ],
-        startFrame: 100,
-        endFrame: 200,
+    const moveAction = createMoveAction("1", 100, 200, [
+      {
+        x: 10,
+        y: 20,
       },
-    };
+    ]);
 
     const result = [moveAction].reduce(reducer, initialState);
 
@@ -117,12 +109,7 @@ describe("reducer", () => {
       ],
     });
 
-    const frameAction: FrameTickAction = {
-      type: "action:frame-tick",
-      payload: {
-        frame: 201,
-      },
-    };
+    const frameAction = createFrameTickAction(210);
 
     const result2 = [frameAction].reduce(reducer, result);
 
