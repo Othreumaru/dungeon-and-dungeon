@@ -109,7 +109,7 @@ describe("reducer", () => {
       ],
     });
 
-    const frameAction = createFrameTickAction(200);
+    const frameAction = createFrameTickAction(210);
 
     const result2 = [frameAction].reduce(reducer, result);
 
