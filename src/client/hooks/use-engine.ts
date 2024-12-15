@@ -1,6 +1,9 @@
 import { useReducer } from "react";
-import { reducer, initialState } from "../../engine/reducer.ts";
+import {
+  rootReducer,
+  initialState,
+} from "../../engine/reducers/root-reducer.ts";
 
 export const useEngine = () => {
-  return useReducer(reducer, initialState);
+  return useReducer(rootReducer, initialState);
 };

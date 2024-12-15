@@ -1,16 +1,16 @@
 import { describe, it } from "node:test";
-import { reducer, initialState } from "./reducer.ts";
+import { rootReducer, initialState } from "./root-reducer.ts";
 import {
   createFrameTickAction,
   type Actions,
   createMoveAction,
-} from "../protocol/actions.ts";
+} from "../../protocol/actions.ts";
 import { deepStrictEqual } from "node:assert";
-import type { State } from "../protocol/state.ts";
+import type { State } from "../../protocol/state.ts";
 
 describe("reducer", () => {
   it("should return the initial state", () => {
-    deepStrictEqual(reducer(undefined, {} as Actions), initialState);
+    deepStrictEqual(rootReducer(undefined, {} as Actions), initialState);
   });
 
   it("should handle move", () => {
@@ -62,7 +62,7 @@ describe("reducer", () => {
       },
     ]);
 
-    const result = [moveAction].reduce(reducer, initialState);
+    const result = [moveAction].reduce(rootReducer, initialState);
 
     deepStrictEqual<State>(result, {
       units: [
@@ -111,7 +111,7 @@ describe("reducer", () => {
 
     const frameAction = createFrameTickAction(210);
 
-    const result2 = [frameAction].reduce(reducer, result);
+    const result2 = [frameAction].reduce(rootReducer, result);
 
     deepStrictEqual<State>(result2, {
       ...result,
