@@ -1,5 +1,5 @@
 import { createContext, useEffect, useReducer } from "react";
-import { reducer, initialState } from "../engine/reducer.ts";
+import { rootReducer, initialState } from "../engine/reducers/root-reducer.ts";
 import { createFrameTickAction, type Actions } from "../protocol/actions.ts";
 import { useServerContext } from "./hooks/use-server-context.ts";
 import type { State } from "../protocol/state.ts";
@@ -15,7 +15,7 @@ export const EngineContextProvider = ({
   children: React.ReactNode;
 }) => {
   const eventEmitter = useServerContext();
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(rootReducer, initialState);
 
   useEffect(() => {
     eventEmitter.on("message", dispatch);

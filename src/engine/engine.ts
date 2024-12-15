@@ -1,6 +1,6 @@
 import EventEmitter from "eventemitter3";
 import type { Actions } from "../protocol/actions.ts";
-import { initialState, reducer } from "./reducer.ts";
+import { initialState, rootReducer } from "./reducers/root-reducer.ts";
 import type { State } from "../protocol/state.ts";
 
 export type EngineApi = {
@@ -16,7 +16,7 @@ export const initEngine = () => {
 
   const api: EngineApi = {
     applyAction: (action, emit = true) => {
-      state = reducer(state, action);
+      state = rootReducer(state, action);
       if (emit) {
         eventEmitter.emit("dispatch", action);
       }
