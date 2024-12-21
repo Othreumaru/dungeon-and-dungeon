@@ -1,9 +1,5 @@
-import {
-  createMoveAction,
-  createUnitSpawnAction,
-} from "../../protocol/actions.ts";
+import { createUnitSpawnAction } from "../../protocol/actions.ts";
 import type { EngineApi } from "../../engine/engine.ts";
-import { aStarSolver } from "../../libs/a-star-solver/a-star-solver.ts";
 import { v4 as uuidv4 } from "uuid";
 import type { ServerApi } from "../server-api.ts";
 import { createUnit } from "../../protocol/state.ts";
@@ -50,35 +46,7 @@ export const tickHandler = (engineApi: EngineApi, serverApi: ServerApi) => {
     if (unit.controller.type === "ai") {
       switch (unit.controller.algorithm.type) {
         case "patrol-and-attack": {
-          if (
-            unit.controller.algorithm.state.type === "patrol" &&
-            unit.state.type === "stationary" &&
-            unit.controller.algorithm.state.endFrame < Date.now() &&
-            unit.actions.some((action) => {
-              return action.name === "move" && action.state.type === "ready";
-            })
-          ) {
-            const randomPosition = {
-              x: Math.floor(Math.random() * 9),
-              y: Math.floor(Math.random() * 9),
-            };
-            const inputGrid: boolean[][] = [...Array(11)].map(() =>
-              [...Array(11)].map(() => true)
-            );
-
-            const path = aStarSolver(
-              inputGrid,
-              { x: unit.state.position.x, y: unit.state.position.y },
-              randomPosition
-            );
-            const action = createMoveAction(
-              unit.id,
-              Date.now(),
-              Date.now() + 200 * path.length,
-              path
-            );
-            serverApi.broadcast(action);
-          }
+          // Implement patrol-and-attack logic
           break;
         }
         case "defend-and-attack": {
