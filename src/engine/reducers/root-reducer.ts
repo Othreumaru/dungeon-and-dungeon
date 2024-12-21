@@ -17,7 +17,11 @@ export const rootReducer = (
       return {
         ...state,
         units: state.units.map((unit) =>
-          unit.id === action.payload.unitId && unit.state.type === "stationary"
+          unit.id === action.payload.unitId &&
+          unit.state.type === "stationary" &&
+          unit.actions
+            .filter((action) => action.name === "move")
+            .every((action) => action.state.type === "ready")
             ? {
                 id: unit.id,
                 color: unit.color,
