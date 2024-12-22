@@ -23,7 +23,7 @@ jobs:
         with:
           type: deploymentStack
           operation: create
-          name: Prod Infrastructure
+          name: Prod-Infrastructure
           location: West Europe
           scope: resourceGroup
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
