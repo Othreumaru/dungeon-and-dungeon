@@ -1,9 +1,12 @@
 services:
-  web:
+  dungeon-and-dungeon:
     build:
       context: .
       dockerfile: Dockerfile
       target: runner
+    image: odrinwhite/dungeon-and-dungeon:latest
     ports:
       - "8080:8080"
+    env_file:
+      - .env
     command: npm run server:dev
