@@ -19,6 +19,8 @@ import { ClientRequests } from "../protocol/requests.ts";
 
 type UpgradedWebSocket = WebSocket & PlayerContext;
 
+const PORT = process.env.PORT || 8080;
+
 const hashStr = (str: string) => {
   const hash = crypto.createHash("md5").update(str).digest("hex");
   return hash;
@@ -32,7 +34,7 @@ export const initServer = (engineApi: EngineApi) => {
   app.use(express.static("dist"));
   app.use("/auth/*", ExpressAuth(expressAuthConfig));
 
-  const server = app.listen(8080, () => {
+  const server = app.listen(PORT, () => {
     console.log("Server is listening...");
   });
 
