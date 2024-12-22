@@ -12,6 +12,7 @@ permissions:
 
 jobs:
   deploy:
+    name: Build and publish Storybook
     runs-on: ubuntu-latest
     steps:
       - id: build-publish
