@@ -36,5 +36,8 @@ jobs:
           deny-settings-mode: none
           parameters: |
             {
-              "containerRegistryPassword":"${{ secrets.DOCKERHUB_TOKEN }}"
+              "containerRegistryPassword":"${{ secrets.DOCKERHUB_TOKEN }}",
+              "authSecret": "${{ secrets.AUTH_SECRET }}",
+              "authGithubId": "${{ secrets.AUTH_GITHUB_ID }}",
+              "authGithubSecret": "${{ secrets.AUTH_GITHUB_SECRET }}"
             }

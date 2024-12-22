@@ -13,6 +13,16 @@ param port int = 8080
 @secure()
 param containerRegistryPassword string = ''
 
+@secure()
+param authSecret string = ''
+
+@secure()
+param authGithubId string = ''
+
+@secure()
+param authGithubSecret string = ''
+
+
 resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2024-10-01-preview' = {
   name: name
   location: location
@@ -20,6 +30,7 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2024-10-01-
     containers: [
       {
         name: name
+        
         properties: {
           image: image
           ports: [
@@ -34,6 +45,24 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2024-10-01-
               memoryInGB: 1
             }
           }
+          environmentVariables: [
+            {
+              name: 'AUTH_SECRET'
+              secureValue: authSecret
+            }
+            {
+              name: 'AUTH_GITHUB_ID'
+              secureValue: authGithubId
+            }
+            {
+              name: 'AUTH_GITHUB_SECRET'
+              secureValue: authGithubSecret
+            }
+            {
+              name: 'AUTH_URL'
+              value: 'http://dungeonanddungeon.westeurope.azurecontainer.io/'
+            }
+          ]
         }
       }
     ]
