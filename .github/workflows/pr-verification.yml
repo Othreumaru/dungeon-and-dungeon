@@ -9,10 +9,13 @@ on:
   pull_request:
     branches: ["main"]
 
+permissions:
+  contents: read
+
 jobs:
   build:
+    name: Build and verify PR
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
       - run: echo "PACKAGE_JSON=$(jq -c . < package.json)" >> $GITHUB_ENV
