@@ -10,5 +10,6 @@
       "filePatterns": ["**/*.spec.ts"],
       "parameters": ["--experimental-strip-types"]
     }
-  ]
+  ],
+  "editor.tabSize": 2
 }

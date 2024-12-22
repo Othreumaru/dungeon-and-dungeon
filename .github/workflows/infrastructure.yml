@@ -1,0 +1,35 @@
+name: Infrastructure
+
+on: [workflow_dispatch]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Azure Login
+        uses: azure/login@a65d910e8af852a8061c627c456678983e180302
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Prod Infrastructure Deployment
+        uses: azure/bicep-deploy@b9a4cc4eedfcb883a766e9f9242b2eb274d28e7a
+        with:
+          type: deploymentStack
+          operation: create
+          name: Prod Infrastructure
+          location: West Europe
+          scope: resourceGroup
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          resource-group-name: ${{ secrets.AZURE_RESOURCE_GROUP }}
+          template-file: ./deploy/main.bicep
+          parameters-file: ./deploy/prod/main.bicepparam
+          action-on-unmanage-resources: delete
+          action-on-unmanage-resourcegroups: delete
+          deny-settings-mode: denyWriteAndDelete
