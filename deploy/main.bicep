@@ -8,7 +8,7 @@ param name string = 'dungeonanddungeoncontainergroup'
 param image string = 'odrinwhite/dungeon-and-dungeon:latest'
 
 @description('Port to open on the container and the public IP address.')
-param port int = 8080
+param port int = 80
 
 @secure()
 param containerRegistryPassword string = ''
@@ -62,6 +62,10 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2024-10-01-
               name: 'AUTH_URL'
               value: 'http://dungeonanddungeon.westeurope.azurecontainer.io/'
             }
+            {
+              name: 'PORT'
+              value: '${port}'
+            }
           ]
         }
       }
@@ -80,7 +84,7 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2024-10-01-
       dnsNameLabel: 'dungeonanddungeon'
       ports: [
         {
-          port: 80
+          port: port
           protocol: 'TCP'
         }
       ]
