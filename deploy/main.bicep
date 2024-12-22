@@ -12,11 +12,6 @@ param environmentType string
 @maxLength(13)
 param resourceNameSuffix string = uniqueString(resourceGroup().id)
 
-@minLength(5)
-@maxLength(50)
-@description('Provide a globally unique name of your Azure Container Registry')
-param acrName string = 'acr${uniqueString(resourceGroup().id)}'
-
 var appServiceAppName = 'dnd-website-${resourceNameSuffix}'
 var appServicePlanName = 'dnd-website-plan'
 
@@ -47,15 +42,6 @@ var environmentConfigurationMap = {
         name: 'Basic'
       }
     }
-  }
-}
-
-resource acrResource 'Microsoft.ContainerRegistry/registries@2023-11-01-preview' = {
-  name: acrName
-  location: location
-  sku: environmentConfigurationMap[environmentType].acr.sku
-  properties: {
-    adminUserEnabled: false
   }
 }
 
