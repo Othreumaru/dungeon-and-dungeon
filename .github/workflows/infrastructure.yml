@@ -26,6 +26,7 @@ jobs:
           name: Prod Infrastructure
           location: West Europe
           scope: resourceGroup
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           resource-group-name: ${{ secrets.AZURE_RESOURCE_GROUP }}
           template-file: ./deploy/main.bicep
           parameters-file: ./deploy/prod/main.bicepparam
