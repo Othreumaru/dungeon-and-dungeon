@@ -34,3 +34,7 @@ jobs:
           action-on-unmanage-resources: delete
           action-on-unmanage-resourcegroups: delete
           deny-settings-mode: denyWriteAndDelete
+          parameters: |
+            {
+              "containerRegistryPassword":"${{ secrets.DOCKERHUB_TOKEN }}"
+            }
