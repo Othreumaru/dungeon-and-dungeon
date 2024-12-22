@@ -48,6 +48,7 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2024-10-01-
     restartPolicy: 'Always'
     ipAddress: {
       type: 'Public'
+      dnsNameLabel: 'dungeonanddungeon'
       ports: [
         {
           port: port
