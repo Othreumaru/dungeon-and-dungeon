@@ -13,20 +13,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Azure Login
-        uses: azure/login@a514566bcd042073414e083c41a3239d2f0f881f
+        uses: azure/login@a65d910e8af852a8061c627c456678983e180302 # v2.2.0
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       - name: Prod Infrastructure Deployment
-        uses: azure/bicep-deploy@b9a4cc4eedfcb883a766e9f9242b2eb274d28e7a
+        uses: azure/bicep-deploy@b9a4cc4eedfcb883a766e9f9242b2eb274d28e7a # v1
         with:
           type: deploymentStack
           operation: create
-          name: Prod-Infrastructure
+          name: Prod Infrastructure
           location: West Europe
           scope: resourceGroup
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           resource-group-name: ${{ secrets.AZURE_RESOURCE_GROUP }}
           template-file: ./deploy/main.bicep
           parameters-file: ./deploy/prod/main.bicepparam
