@@ -53,7 +53,7 @@ jobs:
         uses: azure/bicep-deploy@b9a4cc4eedfcb883a766e9f9242b2eb274d28e7a # v1
         with:
           type: deploymentStack
-          operation: whatIf
+          operation: validate
           name: Prod-Infrastructure
           location: West Europe
           scope: resourceGroup
