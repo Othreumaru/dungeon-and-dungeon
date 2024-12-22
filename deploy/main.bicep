@@ -10,6 +10,9 @@ param image string = 'odrinwhite/dungeon-and-dungeon:latest'
 @description('Port to open on the container and the public IP address.')
 param port int = 8080
 
+@secure()
+param containerRegistryPassword string = ''
+
 resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2024-10-01-preview' = {
   name: name
   location: location
@@ -32,6 +35,13 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2024-10-01-
             }
           }
         }
+      }
+    ]
+    imageRegistryCredentials: [
+      {
+        server: 'index.docker.io'
+        username: 'odrinwhite'
+        password: containerRegistryPassword
       }
     ]
     osType: 'Linux'
