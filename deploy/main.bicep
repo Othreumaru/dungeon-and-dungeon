@@ -80,7 +80,7 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2024-10-01-
       dnsNameLabel: 'dungeonanddungeon'
       ports: [
         {
-          port: port
+          port: 80
           protocol: 'TCP'
         }
       ]
