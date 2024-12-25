@@ -17,6 +17,6 @@ RUN touch .env
 
 RUN npm install --only=prod
 
-EXPOSE 8080
+EXPOSE 80
 
 CMD [ "npm", "run", "server:dev" ]

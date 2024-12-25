@@ -5,7 +5,7 @@ param location string = resourceGroup().location
 param image string = 'odrinwhite/dungeon-and-dungeon:latest'
 
 @description('Port to open on the container and the public IP address.')
-param port int = 8080
+param port int = 80
 
 @secure()
 param containerRegistryPassword string = ''
