@@ -4,9 +4,6 @@ param location string = resourceGroup().location
 @description('Container image to deploy. Should be of the form repoName/imagename:tag for images stored in public Docker Hub, or a fully qualified URI for other registries. Images from private registries require additional registry credentials.')
 param image string = 'odrinwhite/dungeon-and-dungeon:latest'
 
-@description('Port to open on the container and the public IP address.')
-param port int = 80
-
 @secure()
 param containerRegistryPassword string = ''
 
@@ -69,8 +66,6 @@ resource siteAppSettings 'Microsoft.Web/sites/config@2024-04-01' = {
     DOCKER_ENABLE_CI: 'true'
     WEBSOCKETS_ENABLED : 'true'
     WEBSITES_ENABLE_APP_SERVICE_STORAGE: 'false'
-    WEBSITES_PORT: '${port}'
-    PORT: '${port}'
     AUTH_SECRET: authSecret
     AUTH_GITHUB_ID: authGithubId
     AUTH_GITHUB_SECRET: authGithubSecret

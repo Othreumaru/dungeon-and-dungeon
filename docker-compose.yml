@@ -6,7 +6,7 @@ services:
       target: runner
     image: odrinwhite/dungeon-and-dungeon:latest
     ports:
-      - "8080:8080"
+      - "8080:80"
     env_file:
       - .env
     command: npm run server:dev
