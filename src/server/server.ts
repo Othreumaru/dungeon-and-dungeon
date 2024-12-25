@@ -127,6 +127,7 @@ export const initServer = (engineApi: EngineApi) => {
   }
 
   server.on("upgrade", (request, socket, head) => {
+    console.log("upgrade request", request.url);
     socket.on("error", onSocketError);
 
     void authenticate(request, (err, client) => {

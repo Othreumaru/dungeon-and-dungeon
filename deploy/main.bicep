@@ -47,6 +47,8 @@ resource appService 'Microsoft.Web/sites@2024-04-01' = {
       webSocketsEnabled: true
       http20Enabled: true
       alwaysOn: true
+      httpLoggingEnabled: true
+      logsDirectorySizeLimit: 35
     }
     httpsOnly: true
   }
