@@ -35,7 +35,7 @@ export const initServer = (engineApi: EngineApi) => {
   app.use("/auth/*", ExpressAuth(expressAuthConfig));
 
   const server = app.listen(PORT, () => {
-    console.log("Server is listening...");
+    console.log(`Server is listening on port ${PORT}`);
   });
 
   const wss = new WebSocketServer({ noServer: true });
