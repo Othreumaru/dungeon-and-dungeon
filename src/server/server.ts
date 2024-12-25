@@ -19,7 +19,7 @@ import { ClientRequests } from "../protocol/requests.ts";
 
 type UpgradedWebSocket = WebSocket & PlayerContext;
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 80;
 
 const hashStr = (str: string) => {
   const hash = crypto.createHash("md5").update(str).digest("hex");
