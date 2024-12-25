@@ -21,7 +21,7 @@ param authGithubSecret string = ''
 
 
 param webAppName string = uniqueString(resourceGroup().id) // Generate unique String for web app name
-param sku string = 'F1' // The SKU of App Service Plan
+param sku string = 'B1' // The SKU of App Service Plan
 param linuxFxVersion string = 'DOCKER|${image}' // The runtime stack of web app
 
 var appServicePlanName = toLower('dungeon-and-dungeon-plan-${webAppName}')
@@ -48,6 +48,8 @@ resource appService 'Microsoft.Web/sites@2024-04-01' = {
       linuxFxVersion: linuxFxVersion
       numberOfWorkers: 1
       webSocketsEnabled: true
+      http20Enabled: true
+      alwaysOn: true
     }
     httpsOnly: true
   }
