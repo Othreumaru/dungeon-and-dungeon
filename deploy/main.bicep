@@ -1,14 +1,11 @@
 @description('The Azure region into which the resources should be deployed.')
 param location string = resourceGroup().location
 
-@description('Name for the container group')
-param name string = 'dungeonanddungeoncontainergroup'
-
 @description('Container image to deploy. Should be of the form repoName/imagename:tag for images stored in public Docker Hub, or a fully qualified URI for other registries. Images from private registries require additional registry credentials.')
 param image string = 'odrinwhite/dungeon-and-dungeon:latest'
 
 @description('Port to open on the container and the public IP address.')
-param port int = 80
+param port int = 8080
 
 @secure()
 param containerRegistryPassword string = ''
@@ -23,71 +20,54 @@ param authGithubId string = ''
 param authGithubSecret string = ''
 
 
-resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2024-10-01-preview' = {
-  name: name
+param webAppName string = uniqueString(resourceGroup().id) // Generate unique String for web app name
+param sku string = 'F1' // The SKU of App Service Plan
+param linuxFxVersion string = 'DOCKER|${image}' // The runtime stack of web app
+
+var appServicePlanName = toLower('dungeon-and-dungeon-plan-${webAppName}')
+var webSiteName = toLower('dungeon-and-dungeon-${webAppName}')
+
+resource appServicePlan 'Microsoft.Web/serverfarms@2024-04-01' = {
+  name: appServicePlanName
   location: location
   properties: {
-    containers: [
-      {
-        name: name
-        
-        properties: {
-          image: image
-          ports: [
-            {
-              port: port
-              protocol: 'TCP'
-            }
-          ]
-          resources: {
-            requests: {
-              cpu: 1
-              memoryInGB: 1
-            }
-          }
-          environmentVariables: [
-            {
-              name: 'AUTH_SECRET'
-              secureValue: authSecret
-            }
-            {
-              name: 'AUTH_GITHUB_ID'
-              secureValue: authGithubId
-            }
-            {
-              name: 'AUTH_GITHUB_SECRET'
-              secureValue: authGithubSecret
-            }
-            {
-              name: 'AUTH_URL'
-              value: 'http://dungeonanddungeon.westeurope.azurecontainer.io/'
-            }
-            {
-              name: 'PORT'
-              value: '${port}'
-            }
-          ]
-        }
-      }
-    ]
-    imageRegistryCredentials: [
-      {
-        server: 'index.docker.io'
-        username: 'odrinwhite'
-        password: containerRegistryPassword
-      }
-    ]
-    osType: 'Linux'
-    restartPolicy: 'Always'
-    ipAddress: {
-      type: 'Public'
-      dnsNameLabel: 'dungeonanddungeon'
-      ports: [
-        {
-          port: port
-          protocol: 'TCP'
-        }
-      ]
+    reserved: true
+  }
+  sku: {
+    name: sku
+  }
+  kind: 'linux'
+}
+
+resource appService 'Microsoft.Web/sites@2024-04-01' = {
+  name: webSiteName
+  location: location
+  properties: {
+    serverFarmId: appServicePlan.id
+    siteConfig: {
+      linuxFxVersion: linuxFxVersion
+      numberOfWorkers: 1
     }
+    httpsOnly: true
+  }
+  kind: 'app,linux,container'
+  identity: {
+    type: 'SystemAssigned'
+  }
+}
+
+resource siteAppSettings 'Microsoft.Web/sites/config@2024-04-01' = {
+  parent: appService
+  name: 'appsettings'
+  properties: {
+    DOCKER_REGISTRY_SERVER_URL: 'https://index.docker.io'
+    DOCKER_REGISTRY_SERVER_PASSWORD: containerRegistryPassword
+    DOCKER_REGISTRY_SERVER_USERNAME: 'odrinwhite'
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE: 'false'
+    AUTH_SECRET: authSecret
+    AUTH_GITHUB_ID: authGithubId
+    AUTH_GITHUB_SECRET: authGithubSecret
+    AUTH_URL: '${webSiteName}.${location}.azurewebsites.net'
+    PORT: '${port}'
   }
 }
