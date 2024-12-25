@@ -64,6 +64,7 @@ resource siteAppSettings 'Microsoft.Web/sites/config@2024-04-01' = {
     DOCKER_REGISTRY_SERVER_PASSWORD: containerRegistryPassword
     DOCKER_REGISTRY_SERVER_USERNAME: 'odrinwhite'
     DOCKER_ENABLE_CI: 'true'
+    WEBSOCKETS_ENABLED : 'true'
     WEBSITES_ENABLE_APP_SERVICE_STORAGE: 'false'
     AUTH_SECRET: authSecret
     AUTH_GITHUB_ID: authGithubId
