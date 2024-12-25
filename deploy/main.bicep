@@ -20,14 +20,9 @@ param authGithubSecret string = ''
 param webAppName string = uniqueString(resourceGroup().id) // Generate unique String for web app name
 param sku string = 'B1' // The SKU of App Service Plan
 param linuxFxVersion string = 'DOCKER|${image}' // The runtime stack of web app
-param logAnalyticsWorkspace string = '${webAppName}la'
 
 var appServicePlanName = toLower('dungeon-and-dungeon-plan-${webAppName}')
 var webSiteName = toLower('dungeon-and-dungeon-${webAppName}')
-
-resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
-  name: logAnalyticsWorkspace
-}
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2024-04-01' = {
   name: appServicePlanName
@@ -75,19 +70,5 @@ resource siteAppSettings 'Microsoft.Web/sites/config@2024-04-01' = {
     AUTH_GITHUB_ID: authGithubId
     AUTH_GITHUB_SECRET: authGithubSecret
     AUTH_URL: '${webSiteName}.azurecontainer.io'
-  }
-}
-
-resource diagnosticLogs 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-  name: appServicePlan.name
-  scope: appServicePlan
-  properties: {
-    workspaceId: logAnalytics.id
-    metrics: [
-      {
-        category: 'AllMetrics'
-        enabled: true
-      }
-    ]
   }
 }
