@@ -47,6 +47,7 @@ resource appService 'Microsoft.Web/sites@2024-04-01' = {
     siteConfig: {
       linuxFxVersion: linuxFxVersion
       numberOfWorkers: 1
+      webSocketsEnabled: true
     }
     httpsOnly: true
   }
