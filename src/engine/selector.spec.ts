@@ -15,8 +15,11 @@ describe("getUnitPosition", () => {
           y: 20,
         },
         lookAt: {
-          x: 11,
-          y: 20,
+          type: "target:position",
+          position: {
+            x: 11,
+            y: 20,
+          },
         },
       },
     });
@@ -24,8 +27,9 @@ describe("getUnitPosition", () => {
     const result = getUnitPosition(unit, 0);
     deepStrictEqual(result?.position.x, 10);
     deepStrictEqual(result?.position.y, 20);
-    deepStrictEqual(result?.lookAt.x, 11);
-    deepStrictEqual(result?.lookAt.y, 20);
+    deepStrictEqual(result?.lookAt.type, "target:position");
+    deepStrictEqual(result?.lookAt.position.x, 11);
+    deepStrictEqual(result?.lookAt.position.y, 20);
   });
 
   it("should return undefined if path is empty", () => {
@@ -37,6 +41,10 @@ describe("getUnitPosition", () => {
         path: [],
         startFrame: 100,
         endFrame: 200,
+        lookAt: {
+          type: "target:unit",
+          unitId: "2",
+        },
       },
     });
     const result = getUnitPosition(unit, 0);
@@ -55,6 +63,10 @@ describe("getUnitPosition", () => {
             y: 20,
           },
         ],
+        lookAt: {
+          type: "target:unit",
+          unitId: "2",
+        },
         startFrame: 100,
         endFrame: 200,
       },
@@ -62,8 +74,9 @@ describe("getUnitPosition", () => {
     const result = getUnitPosition(unit, 50);
     deepStrictEqual(result?.position.x, 10);
     deepStrictEqual(result?.position.y, 20);
-    deepStrictEqual(result?.lookAt.x, 11);
-    deepStrictEqual(result?.lookAt.y, 20);
+    deepStrictEqual(result?.lookAt.type, "target:position");
+    deepStrictEqual(result?.lookAt.position.x, 11);
+    deepStrictEqual(result?.lookAt.position.y, 20);
   });
 
   it("should return last path point if frame is after last frame", () => {
@@ -82,6 +95,10 @@ describe("getUnitPosition", () => {
             y: 21,
           },
         ],
+        lookAt: {
+          type: "target:unit",
+          unitId: "2",
+        },
         startFrame: 100,
         endFrame: 200,
       },
@@ -89,8 +106,9 @@ describe("getUnitPosition", () => {
     const result = getUnitPosition(state, 250);
     deepStrictEqual(result?.position.x, 10);
     deepStrictEqual(result?.position.y, 21);
-    deepStrictEqual(result?.lookAt.x, 10);
-    deepStrictEqual(result?.lookAt.y, 22);
+    deepStrictEqual(result?.lookAt.type, "target:position");
+    deepStrictEqual(result?.lookAt.position.x, 10);
+    deepStrictEqual(result?.lookAt.position.y, 22);
   });
 
   it("should interpolate position", () => {
@@ -109,6 +127,10 @@ describe("getUnitPosition", () => {
             y: 30,
           },
         ],
+        lookAt: {
+          type: "target:unit",
+          unitId: "2",
+        },
         startFrame: 100,
         endFrame: 200,
       },
@@ -116,7 +138,8 @@ describe("getUnitPosition", () => {
     const result = getUnitPosition(state, 150);
     deepStrictEqual(result?.position.x, 10);
     deepStrictEqual(result?.position.y, 20);
-    deepStrictEqual(result?.lookAt.x, 10);
-    deepStrictEqual(result?.lookAt.y, 20);
+    deepStrictEqual(result?.lookAt.type, "target:position");
+    deepStrictEqual(result?.lookAt.position.x, 10);
+    deepStrictEqual(result?.lookAt.position.y, 20);
   });
 });

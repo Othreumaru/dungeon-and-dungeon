@@ -1,5 +1,11 @@
-import type { MovingUnit, Unit, UnitAction } from "../protocol/state.ts";
+import type {
+  LookAtTarget,
+  MovingUnit,
+  Unit,
+  UnitAction,
+} from "../protocol/state.ts";
 import { normalize2D } from "../libs/math/vector/normalize.ts";
+import type { Vector2D } from "../libs/math/vector/types.ts";
 
 export const getUnitPosition = (
   unit: Unit,
@@ -7,10 +13,7 @@ export const getUnitPosition = (
 ):
   | {
       position: { x: number; y: number };
-      lookAt: {
-        x: number;
-        y: number;
-      };
+      lookAt: LookAtTarget;
     }
   | undefined => {
   if (unit.state.type === "stationary") {
@@ -19,6 +22,14 @@ export const getUnitPosition = (
       lookAt: unit.state.lookAt,
     };
   }
+
+  if (unit.state.type === "attacking-melee") {
+    return {
+      position: unit.state.position,
+      lookAt: unit.state.lookAt,
+    };
+  }
+
   const path = unit.state.path;
   if (path.length === 0) {
     return undefined;
@@ -26,13 +37,17 @@ export const getUnitPosition = (
   if (unit.state.endFrame > frame) {
     return {
       position: path[0],
-      lookAt:
-        path.length >= 2
-          ? path[0]
-          : {
-              x: path[0].x + 1,
-              y: path[0].y,
-            },
+      lookAt: {
+        type: "target:position",
+        position: {
+          ...(path.length >= 2
+            ? path[0]
+            : {
+                x: path[0].x + 1,
+                y: path[0].y,
+              }),
+        },
+      },
     };
   }
   if (unit.state.endFrame < frame) {
@@ -43,8 +58,11 @@ export const getUnitPosition = (
     const lastFrame = {
       position: path[path.length - 1],
       lookAt: {
-        x: path[path.length - 1].x + lookAtVector.x,
-        y: path[path.length - 1].y + lookAtVector.y,
+        type: "target:position" as const,
+        position: {
+          x: path[path.length - 1].x + lookAtVector.x,
+          y: path[path.length - 1].y + lookAtVector.y,
+        },
       },
     };
     return lastFrame;
@@ -68,12 +86,37 @@ export const getUnitPosition = (
           y: currentY,
         },
         lookAt: {
-          x: currentX + lookAtVector.x,
-          y: currentY + lookAtVector.y,
+          type: "target:position" as const,
+          position: {
+            x: currentX + lookAtVector.x,
+            y: currentY + lookAtVector.y,
+          },
         },
       };
     }
   }
+};
+
+export const getPositionsAround = (
+  position: { x: number; y: number },
+  distance: number
+): Vector2D[] => {
+  const positions = [];
+  for (let x = position.x - distance; x <= position.x + distance; x++) {
+    if (x < 0) {
+      continue;
+    }
+    for (let y = position.y - distance; y <= position.y + distance; y++) {
+      if (y < 0) {
+        continue;
+      }
+      if (Math.sqrt((x - position.x) ** 2 + (y - position.y) ** 2) > distance) {
+        continue;
+      }
+      positions.push({ x, y });
+    }
+  }
+  return positions;
 };
 
 export const isUnitDoneMoving = (

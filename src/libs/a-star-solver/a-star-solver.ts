@@ -50,6 +50,8 @@ export const aStarSolver = (
         currentNode = currentNode.parent!;
       }
 
+      path.push({ x: startPoint.x, y: startPoint.y });
+
       return path.reverse();
     }
 

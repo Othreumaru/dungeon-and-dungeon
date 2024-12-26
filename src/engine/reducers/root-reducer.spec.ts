@@ -26,8 +26,11 @@ describe("reducer", () => {
               y: 0,
             },
             lookAt: {
-              x: 1,
-              y: 0,
+              type: "target:position",
+              position: {
+                x: 1,
+                y: 0,
+              },
             },
           },
           model: "skeleton-minion",
@@ -45,8 +48,11 @@ describe("reducer", () => {
               y: 0,
             },
             lookAt: {
-              x: 1,
-              y: 0,
+              type: "target:position",
+              position: {
+                x: 1,
+                y: 0,
+              },
             },
           },
           model: "skeleton-minion",
@@ -83,6 +89,13 @@ describe("reducer", () => {
                 y: 20,
               },
             ],
+            lookAt: {
+              type: "target:position",
+              position: {
+                x: 10,
+                y: 20,
+              },
+            },
             startFrame: 100,
             endFrame: 200,
           },
@@ -101,8 +114,11 @@ describe("reducer", () => {
               y: 0,
             },
             lookAt: {
-              x: 1,
-              y: 0,
+              type: "target:position",
+              position: {
+                x: 1,
+                y: 0,
+              },
             },
           },
           model: "skeleton-minion",
@@ -130,8 +146,11 @@ describe("reducer", () => {
               y: 20,
             },
             lookAt: {
-              x: 11,
-              y: 20,
+              type: "target:position",
+              position: {
+                x: 11,
+                y: 20,
+              },
             },
           },
           model: "skeleton-minion",
@@ -149,8 +168,11 @@ describe("reducer", () => {
               y: 0,
             },
             lookAt: {
-              x: 1,
-              y: 0,
+              type: "target:position",
+              position: {
+                x: 1,
+                y: 0,
+              },
             },
           },
           model: "skeleton-minion",

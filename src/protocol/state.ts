@@ -46,16 +46,28 @@ export const PlayerUnitController = z.object({
 
 export const UnitController = z.union([PlayerUnitController, AiUnitController]);
 
+const LookAtPositionTarget = z.object({
+  type: z.literal("target:position"),
+  position: z.object({
+    x: z.number(),
+    y: z.number(),
+  }),
+});
+
+const LookAtUnitTarget = z.object({
+  type: z.literal("target:unit"),
+  unitId: z.string(),
+});
+
+const LookAtTarget = z.union([LookAtPositionTarget, LookAtUnitTarget]);
+
 export const StationaryUnit = z.object({
   type: z.literal("stationary"),
   position: z.object({
     x: z.number(),
     y: z.number(),
   }),
-  lookAt: z.object({
-    x: z.number(),
-    y: z.number(),
-  }),
+  lookAt: LookAtTarget,
 });
 
 export const MovingUnit = z.object({
@@ -68,9 +80,26 @@ export const MovingUnit = z.object({
       y: z.number(),
     })
   ),
+  lookAt: LookAtTarget,
 });
 
-export const UnitState = z.union([StationaryUnit, MovingUnit]);
+export const AttackingMeleeUnit = z.object({
+  type: z.literal("attacking-melee"),
+  position: z.object({
+    x: z.number(),
+    y: z.number(),
+  }),
+  lookAt: LookAtTarget,
+  startFrame: z.number(),
+  endFrame: z.number(),
+  targetUnitId: z.string(),
+});
+
+export const UnitState = z.union([
+  StationaryUnit,
+  MovingUnit,
+  AttackingMeleeUnit,
+]);
 
 export const CooldownUnitActionState = z.object({
   type: z.literal("cooldown"),
@@ -111,9 +140,11 @@ export type State = z.infer<typeof State>;
 export type Unit = z.infer<typeof Unit>;
 export type MovingUnit = z.infer<typeof MovingUnit>;
 export type StationaryUnit = z.infer<typeof StationaryUnit>;
+export type AttackingMeleeUnit = z.infer<typeof AttackingMeleeUnit>;
 export type UnitAction = z.infer<typeof UnitAction>;
 export type UnitController = z.infer<typeof UnitController>;
 export type UnitState = z.infer<typeof UnitState>;
+export type LookAtTarget = z.infer<typeof LookAtTarget>;
 
 const defaultUnitColor = "red";
 const defaultUnitModel = "skeleton-minion";
@@ -128,6 +159,13 @@ const defaultUnitActions: UnitAction[] = [
       type: "ready",
     },
   },
+  {
+    name: "attack",
+    cooldownSec: 2,
+    state: {
+      type: "ready",
+    },
+  },
 ];
 const defaultUnitState: StationaryUnit = {
   type: "stationary",
@@ -136,8 +174,11 @@ const defaultUnitState: StationaryUnit = {
     y: 0,
   },
   lookAt: {
-    x: 0,
-    y: 1,
+    type: "target:position",
+    position: {
+      x: 1,
+      y: 0,
+    },
   },
 };
 

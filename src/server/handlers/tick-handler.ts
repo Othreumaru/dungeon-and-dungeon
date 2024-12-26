@@ -9,7 +9,7 @@ export const tickHandler = (engineApi: EngineApi, serverApi: ServerApi) => {
   const countOfAIUnits = state.units.filter(
     (unit) => unit.controller.type === "ai"
   ).length;
-  if (countOfAIUnits <= 2) {
+  if (countOfAIUnits < 1) {
     const spawnAction = createUnitSpawnAction(
       createUnit({
         id: uuidv4(),
@@ -21,8 +21,11 @@ export const tickHandler = (engineApi: EngineApi, serverApi: ServerApi) => {
             y: Math.floor(Math.random() * 9),
           },
           lookAt: {
-            x: 1,
-            y: 0,
+            type: "target:position",
+            position: {
+              x: 1,
+              y: 0,
+            },
           },
         },
         controller: {
@@ -43,18 +46,4 @@ export const tickHandler = (engineApi: EngineApi, serverApi: ServerApi) => {
     serverApi.broadcast(spawnAction);
     return;
   }
-  state.units.forEach((unit) => {
-    if (unit.controller.type === "ai") {
-      switch (unit.controller.algorithm.type) {
-        case "patrol-and-attack": {
-          // Implement patrol-and-attack logic
-          break;
-        }
-        case "defend-and-attack": {
-          // Implement defend-and-attack logic
-          break;
-        }
-      }
-    }
-  });
 };

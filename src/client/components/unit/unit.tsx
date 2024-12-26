@@ -1,11 +1,7 @@
-import { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
-import {
-  MovingUnit,
-  StationaryUnit,
-  Unit as UnitType,
-} from "../../../protocol/state";
-import { Mage, MageApi } from "../mage/mage";
+import { MovingUnit, Unit as UnitType } from "../../../protocol/state";
+import { Mage } from "../mage/mage";
 import { useFrame } from "@react-three/fiber";
 import { easing } from "maath";
 import {
@@ -70,52 +66,17 @@ export const Loop = ({
   return null;
 };
 
-const StationaryComponent = ({
-  unit,
-  unitRef,
-}: {
-  unit: StationaryUnit;
-  unitRef: React.MutableRefObject<THREE.Object3D>;
-}) => {
-  useFrame((_, delta) => {
-    unitRef.current.position.set(unit.position.x, 0, unit.position.y);
-    easing.dampLookAt(
-      unitRef.current,
-      new THREE.Vector3(unit.lookAt.x, 0, unit.lookAt.y),
-      focusDamping,
-      delta,
-      maxSpeed,
-      undefined,
-      eps
-    );
-    // unitRef.current.lookAt(new Vector3(unit.lookAt.x, 0, unit.lookAt.y));
-  });
-  return null;
-};
-
 const MovingComponent = ({
   unit,
   unitRef,
-  audioRef,
-  unitApiRef,
 }: {
   unit: MovingUnit;
   unitRef: React.MutableRefObject<THREE.Object3D>;
-  audioRef: React.MutableRefObject<THREE.PositionalAudio>;
-  unitApiRef: React.MutableRefObject<MageApi>;
 }) => {
-  useEffect(() => {
-    const currentAudioRef = audioRef.current;
-    const currentUnitApiRef = unitApiRef.current;
-    currentAudioRef.play();
-    currentUnitApiRef.playAnimation("Running_A");
-    return () => {
-      currentUnitApiRef.playAnimation("Idle");
-      currentAudioRef.stop();
-    };
-  });
+  // console.log("moving component render");
 
   const curves = useMemo(() => {
+    console.log("curves memo", unit.path);
     const curves = unit.path.slice(0, -1).map((point, index) => {
       const currentPoint = new THREE.Vector3(point.x, 0, point.y);
       const nextPoint = new THREE.Vector3(
@@ -132,7 +93,7 @@ const MovingComponent = ({
       );
     });
     return curves;
-  }, [unit]);
+  }, [unit.path]);
 
   useEffect(() => {
     const currentUnitRef = unitRef.current;
@@ -184,18 +145,85 @@ const CameraText = ({ text }: { text: string }) => {
   );
 };
 
-export const Unit = ({ unit }: { unit: UnitType; now?: number }) => {
+const UnitComponent = ({ unit }: { unit: UnitType; now?: number }) => {
   const unitRef = useRef<THREE.Group>(null);
   const audioRef = useRef<THREE.PositionalAudio>(null);
   const unitApiRef = useRef<{
     playAnimation: (animation: string) => void;
+    stopAnimation: (animation: string) => void;
   }>(null);
 
   useEffect(() => {
-    audioRef.current?.setVolume(0.1);
-  }, []);
+    if (unitRef.current) {
+      unitRef.current.userData.unitId = unit.id;
+    }
+    audioRef.current?.setVolume(0);
+  }, [unit.id]);
 
-  console.log("unit render");
+  useEffect(() => {
+    if (audioRef.current?.isPlaying) {
+      audioRef.current?.stop();
+    }
+    if (unit.state.type === "attacking-melee") {
+      unitApiRef.current?.playAnimation("Unarmed_Melee_Attack_Punch_A");
+    }
+    if (unit.state.type === "stationary") {
+      unitApiRef.current?.playAnimation("Idle");
+    }
+    if (unit.state.type === "moving") {
+      audioRef.current?.play();
+      unitApiRef.current?.playAnimation("Running_A");
+    }
+  }, [unit.state.type]);
+
+  useFrame((_, delta) => {
+    if (!unitRef.current) {
+      return;
+    }
+    if (unit.state.type !== "stationary") {
+      return;
+    }
+    unitRef.current.position.set(
+      unit.state.position.x,
+      0,
+      unit.state.position.y
+    );
+    if (unit.state.lookAt.type === "target:position") {
+      easing.dampLookAt(
+        unitRef.current,
+        new THREE.Vector3(
+          unit.state.lookAt.position.x,
+          0,
+          unit.state.lookAt.position.y
+        ),
+        focusDamping,
+        delta,
+        maxSpeed,
+        undefined,
+        eps
+      );
+    } else if (unit.state.lookAt.type === "target:unit") {
+      const targetUnitId = unit.state.lookAt.unitId;
+      const targetUnitRef = unitRef.current.parent?.parent?.children.find(
+        (child) => child.children[0].userData.unitId === targetUnitId
+      );
+      if (!targetUnitRef || !targetUnitRef.children[0]?.position) {
+        return;
+      }
+      easing.dampLookAt(
+        unitRef.current,
+        targetUnitRef.children[0].position,
+        focusDamping,
+        delta,
+        maxSpeed,
+        undefined,
+        eps
+      );
+    }
+    // unitRef.current.lookAt(new Vector3(unit.lookAt.x, 0, unit.lookAt.y));
+  });
+
+  console.log(`unit render (name: ${unit.name} id: ${unit.id})`);
 
   return (
     <group>
@@ -227,17 +255,11 @@ export const Unit = ({ unit }: { unit: UnitType; now?: number }) => {
       {unit.state.type === "moving" && (
         <MovingComponent
           unitRef={unitRef as React.MutableRefObject<THREE.Object3D>}
-          audioRef={audioRef as React.MutableRefObject<THREE.PositionalAudio>}
-          unitApiRef={unitApiRef as React.MutableRefObject<MageApi>}
-          unit={unit.state}
-        />
-      )}
-      {unit.state.type === "stationary" && (
-        <StationaryComponent
-          unitRef={unitRef as React.MutableRefObject<THREE.Object3D>}
           unit={unit.state}
         />
       )}
     </group>
   );
 };
+
+export const Unit = React.memo(UnitComponent);
