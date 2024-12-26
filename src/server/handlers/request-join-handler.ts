@@ -46,6 +46,7 @@ export const requestJoinHandler = (
   const spawnAction = createUnitSpawnAction(
     createUnit({
       id: userId,
+      name: playerContext.session.name,
       state: {
         type: "stationary",
         position: randomPosition,

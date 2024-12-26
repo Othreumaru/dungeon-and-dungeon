@@ -15,6 +15,7 @@ import {
 import { PositionalAudio } from "@react-three/drei";
 import { clamp } from "../../../libs/math/clamp";
 import { SkeletonMinion } from "../skeleton-minion/skeleton-minion";
+import { Text } from "@react-three/drei";
 
 const MAGE_SCALE: THREE.Vector3 = new THREE.Vector3(0.5, 0.5, 0.5);
 const MAGE_POSITION: THREE.Vector3 = new THREE.Vector3(0, -0.1, 0);
@@ -161,6 +162,28 @@ const MovingComponent = ({
   );
 };
 
+const CameraText = ({ text }: { text: string }) => {
+  const textRef = useRef<THREE.Mesh>(null);
+
+  useFrame((state) => {
+    if (!textRef.current) {
+      return;
+    }
+    textRef.current.lookAt(state.camera.position);
+  });
+
+  return (
+    <Text
+      ref={textRef}
+      scale={[0.2, 0.2, 0.2]}
+      position={[0, 1.3, 0]}
+      color="white"
+    >
+      {text}
+    </Text>
+  );
+};
+
 export const Unit = ({ unit }: { unit: UnitType; now?: number }) => {
   const unitRef = useRef<THREE.Group>(null);
   const audioRef = useRef<THREE.PositionalAudio>(null);
@@ -177,6 +200,7 @@ export const Unit = ({ unit }: { unit: UnitType; now?: number }) => {
   return (
     <group>
       <group ref={unitRef}>
+        <CameraText text={unit.name} />
         {unit.model === "skeleton-minion" && (
           <SkeletonMinion
             ref={unitApiRef}

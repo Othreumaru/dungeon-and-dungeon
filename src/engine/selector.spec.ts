@@ -7,6 +7,7 @@ describe("getUnitPosition", () => {
   it("should return stationary unit", () => {
     const unit = createUnit({
       id: "1",
+      name: "unit1",
       state: {
         type: "stationary",
         position: {
@@ -30,6 +31,7 @@ describe("getUnitPosition", () => {
   it("should return undefined if path is empty", () => {
     const unit = createUnit({
       id: "1",
+      name: "unit1",
       state: {
         type: "moving",
         path: [],
@@ -44,6 +46,7 @@ describe("getUnitPosition", () => {
   it("should return first path point if frame is before first frame", () => {
     const unit = createUnit({
       id: "1",
+      name: "unit1",
       state: {
         type: "moving",
         path: [
@@ -66,6 +69,7 @@ describe("getUnitPosition", () => {
   it("should return last path point if frame is after last frame", () => {
     const state = createUnit({
       id: "1",
+      name: "unit1",
       state: {
         type: "moving",
         path: [
@@ -92,6 +96,7 @@ describe("getUnitPosition", () => {
   it("should interpolate position", () => {
     const state = createUnit({
       id: "1",
+      name: "unit1",
       state: {
         type: "moving",
         path: [

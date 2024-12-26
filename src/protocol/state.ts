@@ -95,6 +95,7 @@ export const UnitAction = z.object({
 
 export const Unit = z.object({
   id: z.string(),
+  name: z.string(),
   color: z.string(),
   model: z.string(),
   controller: UnitController,
@@ -142,6 +143,7 @@ const defaultUnitState: StationaryUnit = {
 
 export const createUnit = ({
   id,
+  name,
   color = defaultUnitColor,
   model = defaultUnitModel,
   controller = defaultUnitController,
@@ -149,6 +151,7 @@ export const createUnit = ({
   state = defaultUnitState,
 }: {
   id: string;
+  name: string;
   color?: string;
   model?: string;
   controller?: UnitController;
@@ -156,6 +159,7 @@ export const createUnit = ({
   state?: UnitState;
 }): Unit => ({
   id,
+  name,
   color,
   model,
   controller,

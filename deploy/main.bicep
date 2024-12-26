@@ -71,6 +71,6 @@ resource siteAppSettings 'Microsoft.Web/sites/config@2024-04-01' = {
     AUTH_SECRET: authSecret
     AUTH_GITHUB_ID: authGithubId
     AUTH_GITHUB_SECRET: authGithubSecret
-    AUTH_URL: '${webSiteName}.azurecontainer.io'
+    AUTH_URL: 'https://${webSiteName}.azurecontainer.io'
   }
 }

@@ -18,6 +18,7 @@ describe("reducer", () => {
       units: [
         {
           id: "1",
+          name: "unit1",
           state: {
             type: "stationary",
             position: {
@@ -36,6 +37,7 @@ describe("reducer", () => {
         },
         {
           id: "2",
+          name: "unit1",
           state: {
             type: "stationary",
             position: {
@@ -68,6 +70,7 @@ describe("reducer", () => {
       units: [
         {
           id: "1",
+          name: "unit1",
           state: {
             type: "moving",
             path: [
@@ -90,6 +93,7 @@ describe("reducer", () => {
         },
         {
           id: "2",
+          name: "unit1",
           state: {
             type: "stationary",
             position: {
@@ -118,6 +122,7 @@ describe("reducer", () => {
       units: [
         {
           id: "1",
+          name: "unit1",
           state: {
             type: "stationary",
             position: {
@@ -136,6 +141,7 @@ describe("reducer", () => {
         },
         {
           id: "2",
+          name: "unit1",
           state: {
             type: "stationary",
             position: {

@@ -13,6 +13,7 @@ export const tickHandler = (engineApi: EngineApi, serverApi: ServerApi) => {
     const spawnAction = createUnitSpawnAction(
       createUnit({
         id: uuidv4(),
+        name: "Skeleton",
         state: {
           type: "stationary",
           position: {

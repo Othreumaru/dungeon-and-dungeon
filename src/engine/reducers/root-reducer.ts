@@ -24,6 +24,7 @@ export const rootReducer = (
             .every((action) => action.state.type === "ready")
             ? {
                 id: unit.id,
+                name: unit.name,
                 color: unit.color,
                 model: unit.model,
                 controller: unit.controller,

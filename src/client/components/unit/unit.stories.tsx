@@ -76,6 +76,7 @@ Sample1.args = {
   now: 1,
   unit: {
     id: "1",
+    name: "unit1",
     state: {
       type: "moving",
       startFrame: 0,
