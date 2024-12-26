@@ -51,7 +51,12 @@ export const stationaryAiToMoving = (
   );
 
   state.units.forEach((unit) => {
-    const position = getUnitPosition(unit, frame)?.position;
+    const position =
+      unit.state.type === "stationary"
+        ? unit.state.position
+        : unit.state.type === "moving"
+          ? unit.state.path[unit.state.path.length - 1]
+          : unit.state.position;
     if (position) {
       inputGrid[position.x][position.y] = false;
     }
@@ -73,6 +78,10 @@ export const stationaryAiToMoving = (
       }
       return a.length - b.length;
     });
+
+  if (paths.length === 0 || paths[0].length < 2) {
+    return unit;
+  }
 
   return {
     ...unit,

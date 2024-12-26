@@ -154,7 +154,7 @@ const defaultUnitController: UnitController = {
 const defaultUnitActions: UnitAction[] = [
   {
     name: "move",
-    cooldownSec: 8,
+    cooldownSec: 4,
     state: {
       type: "ready",
     },

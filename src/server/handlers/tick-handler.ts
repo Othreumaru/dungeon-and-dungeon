@@ -9,7 +9,7 @@ export const tickHandler = (engineApi: EngineApi, serverApi: ServerApi) => {
   const countOfAIUnits = state.units.filter(
     (unit) => unit.controller.type === "ai"
   ).length;
-  if (countOfAIUnits < 1) {
+  if (countOfAIUnits < 8) {
     const spawnAction = createUnitSpawnAction(
       createUnit({
         id: uuidv4(),
