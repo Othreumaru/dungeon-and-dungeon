@@ -1,5 +1,6 @@
 import type { Actions } from "../../protocol/actions.ts";
 import type { State } from "../../protocol/state.ts";
+import { getUnchangedObject } from "./compare-and-return.ts";
 import { frameTickReducer } from "./frame-tick-reducer.ts";
 
 export const initialState: State = {
@@ -17,11 +18,7 @@ export const rootReducer = (
       return {
         ...state,
         units: state.units.map((unit) =>
-          unit.id === action.payload.unitId &&
-          unit.state.type === "stationary" &&
-          unit.actions
-            .filter((action) => action.name === "move")
-            .every((action) => action.state.type === "ready")
+          unit.id === action.payload.unitId && unit.state.type === "stationary"
             ? {
                 id: unit.id,
                 name: unit.name,
@@ -52,6 +49,11 @@ export const rootReducer = (
                     },
                     ...action.payload.path,
                   ],
+                  lookAt: {
+                    type: "target:position",
+                    position:
+                      action.payload.path[action.payload.path.length - 1],
+                  },
                 },
               }
             : unit
@@ -60,7 +62,14 @@ export const rootReducer = (
     case "action:chat":
       return state;
     case "action:frame-tick": {
-      return frameTickReducer(state, action);
+      const unitIds = state.units.map((unit) => unit.id);
+
+      return getUnchangedObject(
+        state,
+        unitIds.reduce((state, unitId) => {
+          return frameTickReducer(state, action, unitId);
+        }, state)
+      );
     }
     case "action:unit-spawn":
       return {

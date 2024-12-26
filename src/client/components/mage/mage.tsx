@@ -160,7 +160,8 @@ interface AnimationClip extends THREE.AnimationClip {
 const MageGLBPath = "./Mage.glb";
 
 export type MageApi = {
-  playAnimation: (name: ActionName) => void;
+  playAnimation: (name: ActionName, durationMs: number, loop: boolean) => void;
+  stopAnimation: (name: ActionName) => void;
 };
 
 const MageComponent: ForwardRefRenderFunction<
@@ -239,13 +240,27 @@ const MageComponent: ForwardRefRenderFunction<
 
   useImperativeHandle(fref, () => {
     return {
-      playAnimation: (name: ActionName) => {
+      playAnimation: (
+        name: ActionName,
+        durationMs: number,
+        loop: boolean = true
+      ) => {
         if (prevAnimation.current !== null) {
           actions[prevAnimation.current]?.stop();
         }
         if (actions[name]) {
+          actions[name].reset();
+          if (!loop) {
+            actions[name].setLoop(THREE.LoopOnce, 1);
+          }
+          actions[name].setDuration(durationMs / 1000);
           actions[name].play();
           prevAnimation.current = name;
+        }
+      },
+      stopAnimation: (name: ActionName) => {
+        if (actions[name]) {
+          actions[name].stop();
         }
       },
     };

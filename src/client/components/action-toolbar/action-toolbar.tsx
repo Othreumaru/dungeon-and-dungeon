@@ -17,18 +17,6 @@ export function ActionToolbar() {
       {actions.map((action) => (
         <Action key={action.name} action={action} />
       ))}
-      <Action
-        key={"test1"}
-        action={{
-          name: "test1",
-        }}
-      />
-      <Action
-        key={"test2"}
-        action={{
-          name: "test2",
-        }}
-      />
     </div>
   );
 }

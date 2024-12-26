@@ -103,6 +103,13 @@ Sample1.args = {
           y: 0,
         },
       ],
+      lookAt: {
+        type: "target:position",
+        position: {
+          x: 1,
+          y: 0,
+        },
+      },
     },
     model: "mage",
     actions: [],
