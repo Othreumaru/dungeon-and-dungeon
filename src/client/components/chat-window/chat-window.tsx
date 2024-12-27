@@ -44,7 +44,11 @@ export function ChatWindow() {
                       )?.color ?? "black",
                   }}
                 >
-                  {`${message.payload.userId.slice(0, 5)}: ${message.payload.message}`}
+                  {`${
+                    state.units.find(
+                      (unit) => unit.id === message.payload.userId
+                    )?.name ?? "Unknown"
+                  }: ${message.payload.message}`}
                 </div>
               ) : (
                 <div key={index} className="chat-window-chat-action">
@@ -61,6 +65,7 @@ export function ChatWindow() {
             onKeyUp={(event) => {
               if (event.key === "Enter") {
                 emitChatRequest(eventEmitter, event.currentTarget.value);
+                event.currentTarget.value = "";
               }
             }}
           />
