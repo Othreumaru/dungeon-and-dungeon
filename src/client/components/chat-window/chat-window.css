@@ -9,10 +9,24 @@
 
 .chat-window-header {
   background-color: #393939;
-  padding: 1rem;
   border-bottom: 1px solid #e0e0e0;
-  max-height: 1.5rem;
   min-width: 20rem;
+  display: flex;
+  flex-direction: row;
+}
+
+.chat-window-header-tab {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #e0e0e0;
+  padding-top: 0.1rem;
+  padding-bottom: 0.1rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  margin-left: 0.1rem;
+  border-top-left-radius: 0.4rem;
+  border-top-right-radius: 0.4rem;
 }
 
 .chat-window-content {
