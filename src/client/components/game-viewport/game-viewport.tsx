@@ -18,6 +18,7 @@ export const GameViewport = () => {
         position: "absolute",
         top: 0,
         left: 0,
+        background: "lightgray",
       }}
       camera={{ position: [5, 6, 12], rotation: [1.7 * Math.PI, 0, 0] }}
     >

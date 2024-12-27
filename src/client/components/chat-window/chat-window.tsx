@@ -41,8 +41,8 @@ export function ChatWindow() {
   const { ref } = useDrag({
     onDrag: (e) => {
       setWindowPosition({
-        x: windowPosition.x + e.movementX / window.innerWidth,
-        y: windowPosition.y + e.movementY / window.innerHeight,
+        x: e.pageX,
+        y: e.pageY,
       });
     },
   });
@@ -73,8 +73,8 @@ export function ChatWindow() {
     <div
       style={{
         position: "fixed",
-        top: `calc(${windowPosition.y * 100}% - ${rem(8)})`,
-        left: `calc(${windowPosition.x * 100}% - ${rem(8)})`,
+        top: `${windowPosition.y}px`,
+        left: `${windowPosition.x}px`,
       }}
     >
       <Paper
@@ -112,13 +112,16 @@ export function ChatWindow() {
             </Tabs.List>
           </Group>
           <Tabs.Panel value="chat">
-            <ScrollArea w={300} h={200}>
-              <Flex direction="column" gap="md">
+            <ScrollArea w={400} h={200}>
+              <Flex direction="column" p={10}>
                 {actions
                   .filter((action) => action.type === "action:chat")
                   .map((message, index) => (
-                    <Box
+                    <Text
                       key={index}
+                      fz="xs"
+                      lh="xs"
+                      ta="left"
                       style={{
                         color:
                           state.units.find(
@@ -131,32 +134,40 @@ export function ChatWindow() {
                           (unit) => unit.id === message.payload.userId
                         )?.name ?? "Unknown"
                       }: ${message.payload.message}`}
-                    </Box>
+                    </Text>
                   ))}
               </Flex>
             </ScrollArea>
-            <Input
-              placeholder="Send meessage..."
-              onKeyUp={(event) => {
-                if (event.key === "Enter") {
-                  emitChatRequest(eventEmitter, event.currentTarget.value);
-                  event.currentTarget.value = "";
-                }
-              }}
-            />
+            <Box pl={rem(10)} pr={10}>
+              <Input
+                placeholder="Send meessage..."
+                onKeyUp={(event) => {
+                  if (event.key === "Enter") {
+                    emitChatRequest(eventEmitter, event.currentTarget.value);
+                    event.currentTarget.value = "";
+                  }
+                }}
+              />
+            </Box>
           </Tabs.Panel>
           <Tabs.Panel value="messages">
-            <ScrollArea w={400} h={200}>
-              <Flex direction="column" gap="md">
+            <ScrollArea w={390} h={250} scrollbars="y" p={10}>
+              <Flex direction="column">
                 {actions.map((message, index) => (
-                  <Text fz="xs" lh="xs" ta="left" m={rem(10)} key={index}>
+                  <Text fz="xs" lh="xs" ta="left" m={rem(5)} key={index}>
                     {JSON.stringify(message)}
                   </Text>
                 ))}
               </Flex>
             </ScrollArea>
           </Tabs.Panel>
-          <Tabs.Panel value="settings">State debug comming soon...</Tabs.Panel>
+          <Tabs.Panel value="settings">
+            <ScrollArea w={390} h={250} scrollbars="y" p={10}>
+              <Text ta="left" fz="xs" lh="xs" component="pre">
+                {JSON.stringify(state, null, 2)}
+              </Text>
+            </ScrollArea>
+          </Tabs.Panel>
         </Tabs>
       </Paper>
     </div>
