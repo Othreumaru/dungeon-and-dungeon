@@ -18,24 +18,41 @@ import {
   IconMessageCircle,
   IconSettings,
   IconGridDots,
+  IconBaselineDensityMedium,
 } from "@tabler/icons-react";
 import { useDrag } from "../../hooks/use-drag";
-import { useLocalStorage } from "@mantine/hooks";
+import { useElementSize, useLocalStorage } from "@mantine/hooks";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Actions } from "../../../protocol/actions";
 import { useServerContext } from "../../hooks/use-server-context";
 
 export function ChatWindow() {
+  const { ref: resizeRef } = useElementSize();
   const [windowHeight] = useState(300);
   const [selectedTab, setSelectedTab] = useLocalStorage<string | null>({
     key: "window-tab",
     defaultValue: "chat",
+  });
+  const [windowSize, setWindowSize] = useLocalStorage({
+    key: "window-size",
+    defaultValue: {
+      width: 400,
+      height: 300,
+    },
   });
   const [windowPosition, setWindowPosition] = useLocalStorage({
     key: "window-position",
     defaultValue: {
       x: 0,
       y: (window.innerHeight - windowHeight) / window.innerHeight,
+    },
+  });
+  const { ref: dragRef } = useDrag({
+    onDrag: (e) => {
+      setWindowSize({
+        width: Math.max(e.pageX - windowPosition.x, 400),
+        height: Math.max(e.pageY - windowPosition.y, 300),
+      });
     },
   });
   const { ref } = useDrag({
@@ -81,9 +98,15 @@ export function ChatWindow() {
         withBorder
         shadow="sm"
         radius="md"
-        style={{ width: rem(400), height: rem(windowHeight) }}
+        style={{ width: rem(windowSize.width), height: rem(windowSize.height) }}
+        ref={resizeRef}
       >
-        <Tabs value={selectedTab} onChange={setSelectedTab} variant="outline">
+        <Tabs
+          value={selectedTab}
+          onChange={setSelectedTab}
+          variant="outline"
+          h={"calc(100% - 40px)"}
+        >
           <Group justify="start">
             <Box component="div" ref={ref} p={rem(8)}>
               <IconGridDots
@@ -104,41 +127,46 @@ export function ChatWindow() {
                 Messages
               </Tabs.Tab>
               <Tabs.Tab
-                value="settings"
+                value="state-debug"
                 leftSection={<IconSettings style={iconStyle} />}
               >
                 State Debug
               </Tabs.Tab>
             </Tabs.List>
           </Group>
-          <Tabs.Panel value="chat">
-            <ScrollArea w={400} h={200}>
-              <Flex direction="column" p={10}>
-                {actions
-                  .filter((action) => action.type === "action:chat")
-                  .map((message, index) => (
-                    <Text
-                      key={index}
-                      fz="xs"
-                      lh="xs"
-                      ta="left"
-                      style={{
-                        color:
+          <Tabs.Panel value="chat" h={"100%"}>
+            <Flex
+              direction="column"
+              p={10}
+              justify={"space-between"}
+              h={"100%"}
+            >
+              <ScrollArea w={"100%"} h={"100%"}>
+                <Flex direction="column" p={10}>
+                  {actions
+                    .filter((action) => action.type === "action:chat")
+                    .map((message, index) => (
+                      <Text
+                        key={index}
+                        fz="xs"
+                        lh="xs"
+                        ta="left"
+                        style={{
+                          color:
+                            state.units.find(
+                              (unit) => unit.id === message.payload.userId
+                            )?.color ?? "black",
+                        }}
+                      >
+                        {`${
                           state.units.find(
                             (unit) => unit.id === message.payload.userId
-                          )?.color ?? "black",
-                      }}
-                    >
-                      {`${
-                        state.units.find(
-                          (unit) => unit.id === message.payload.userId
-                        )?.name ?? "Unknown"
-                      }: ${message.payload.message}`}
-                    </Text>
-                  ))}
-              </Flex>
-            </ScrollArea>
-            <Box pl={rem(10)} pr={10}>
+                          )?.name ?? "Unknown"
+                        }: ${message.payload.message}`}
+                      </Text>
+                    ))}
+                </Flex>
+              </ScrollArea>
               <Input
                 placeholder="Send meessage..."
                 onKeyUp={(event) => {
@@ -147,12 +175,13 @@ export function ChatWindow() {
                     event.currentTarget.value = "";
                   }
                 }}
+                mb={rem(5)}
               />
-            </Box>
+            </Flex>
           </Tabs.Panel>
-          <Tabs.Panel value="messages">
-            <ScrollArea w={390} h={250} scrollbars="y" p={10}>
-              <Flex direction="column">
+          <Tabs.Panel value="messages" h={"100%"}>
+            <ScrollArea w={"100%"} h={"100%"} scrollbars="y" p={10}>
+              <Flex direction="column" gap={rem(10)} w={windowSize.width}>
                 {actions.map((message, index) => (
                   <Text fz="xs" lh="xs" ta="left" m={rem(5)} key={index}>
                     {JSON.stringify(message)}
@@ -161,14 +190,35 @@ export function ChatWindow() {
               </Flex>
             </ScrollArea>
           </Tabs.Panel>
-          <Tabs.Panel value="settings">
-            <ScrollArea w={390} h={250} scrollbars="y" p={10}>
+          <Tabs.Panel value="state-debug" h={"100%"}>
+            <ScrollArea w={"100%"} h={"100%"} scrollbars="y" p={10}>
               <Text ta="left" fz="xs" lh="xs" component="pre">
                 {JSON.stringify(state, null, 2)}
               </Text>
             </ScrollArea>
           </Tabs.Panel>
         </Tabs>
+        <div
+          style={{
+            position: "absolute",
+            bottom: 0,
+            right: 0,
+            width: "16px",
+            height: "16px",
+            opacity: 0.3,
+            overflow: "hidden",
+            userSelect: "none",
+          }}
+          ref={dragRef}
+        >
+          <IconBaselineDensityMedium
+            style={{
+              width: rem(24),
+              height: rem(24),
+              transform: "rotate(-45deg) translate(0, 4px)",
+            }}
+          />
+        </div>
       </Paper>
     </div>
   );
