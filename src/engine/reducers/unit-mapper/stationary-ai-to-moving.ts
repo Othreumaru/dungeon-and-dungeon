@@ -92,17 +92,18 @@ export const stationaryAiToMoving = (
       path: paths[0],
       lookAt: unit.state.lookAt,
     },
-    actions: [
-      ...unit.actions,
-      {
-        name: "move",
-        cooldownSec: 2,
-        state: {
-          type: "cooldown",
-          startFrame: Date.now(),
-          endFrame: Date.now() + 2000,
-        },
-      },
-    ],
+    actions: unit.actions.map((unitAction) => {
+      return unitAction.name === "move"
+        ? {
+            name: "move",
+            cooldownSec: 2,
+            state: {
+              type: "cooldown",
+              startFrame: Date.now(),
+              endFrame: Date.now() + 2000,
+            },
+          }
+        : unitAction;
+    }),
   };
 };
