@@ -7,7 +7,7 @@ import { EngineContext } from "../../engine-context";
 export const GameViewport = () => {
   const state = useContext(EngineContext);
 
-  console.log("rendering game viewport");
+  // console.log("rendering game viewport");
 
   return (
     <Canvas

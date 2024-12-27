@@ -36,7 +36,7 @@ export const useServer = () => {
     socketRef.current = socket;
 
     eventEmitter.on("request", (data) => {
-      console.log(`sending: ${JSON.stringify(data)}`);
+      console.log(`sending: ${JSON.stringify(data, null, 2)}`);
       if (socket.readyState === WebSocket.OPEN) {
         socket.send(JSON.stringify(data));
       }
