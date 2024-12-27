@@ -100,6 +100,7 @@ export function ChatWindow() {
         radius="md"
         style={{ width: rem(windowSize.width), height: rem(windowSize.height) }}
         ref={resizeRef}
+        opacity={0.7}
       >
         <Tabs
           value={selectedTab}
