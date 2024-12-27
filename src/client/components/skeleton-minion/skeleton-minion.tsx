@@ -190,7 +190,7 @@ const SkeletonMinionStructure = memo(
     skeleton: THREE.Skeleton | undefined;
     addBoneRoot: (bone: THREE.Bone) => void;
   }) => {
-    console.log("rendered");
+    // console.log("rendered");
     return (
       <>
         <skinnedMesh

@@ -76,7 +76,6 @@ const MovingComponent = ({
   // console.log("moving component render");
 
   const curves = useMemo(() => {
-    console.log("curves memo", unit.path);
     const curves = unit.path.slice(0, -1).map((point, index) => {
       const currentPoint = new THREE.Vector3(point.x, 0, point.y);
       const nextPoint = new THREE.Vector3(
@@ -223,7 +222,7 @@ const UnitComponent = ({ unit }: { unit: UnitType; now?: number }) => {
     // unitRef.current.lookAt(new Vector3(unit.lookAt.x, 0, unit.lookAt.y));
   });
 
-  console.log(`unit render (name: ${unit.name} id: ${unit.id})`);
+  // console.log(`unit render (name: ${unit.name} id: ${unit.id})`);
 
   return (
     <group>

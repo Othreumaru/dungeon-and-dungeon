@@ -42,7 +42,7 @@ export const initServer = (engineApi: EngineApi) => {
 
   const broadcast = (data: Actions) => {
     engineApi.applyAction(data, false);
-    const buffer = JSON.stringify(data);
+    const buffer = JSON.stringify(data, null, 2);
     console.log("broadcasting", buffer);
     wss.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
