@@ -207,6 +207,7 @@ const UnitComponent = ({ unit }: { unit: UnitType; now?: number }) => {
         (child) => child.children[0].userData.unitId === targetUnitId
       );
       if (!targetUnitRef || !targetUnitRef.children[0]?.position) {
+        console.warn("target unit not found");
         return;
       }
       easing.dampLookAt(
