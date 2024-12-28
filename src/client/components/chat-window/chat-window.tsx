@@ -25,6 +25,7 @@ import { useElementSize, useLocalStorage } from "@mantine/hooks";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Actions } from "../../../protocol/actions";
 import { useServerContext } from "../../hooks/use-server-context";
+import { JSONPath } from "jsonpath-plus";
 
 export function ChatWindow() {
   const { ref: resizeRef } = useElementSize();
@@ -46,6 +47,10 @@ export function ChatWindow() {
       x: 0,
       y: (window.innerHeight - windowHeight) / window.innerHeight,
     },
+  });
+  const [jsonPath, setJsonPath] = useLocalStorage({
+    key: "json-path",
+    defaultValue: "$",
   });
   const { ref: dragRef } = useDrag({
     onDrag: (e) => {
@@ -192,11 +197,28 @@ export function ChatWindow() {
             </ScrollArea>
           </Tabs.Panel>
           <Tabs.Panel value="state-debug" h={"100%"}>
-            <ScrollArea w={"100%"} h={"100%"} scrollbars="y" p={10}>
-              <Text ta="left" fz="xs" lh="xs" component="pre">
-                {JSON.stringify(state, null, 2)}
-              </Text>
-            </ScrollArea>
+            <Flex
+              direction="column"
+              p={10}
+              justify={"space-between"}
+              h={"100%"}
+            >
+              <Input
+                value={jsonPath}
+                placeholder="JSON Path filter..."
+                onChange={(event) => setJsonPath(event.currentTarget.value)}
+                mb={rem(5)}
+              />
+              <ScrollArea w={"100%"} h={"100%"} scrollbars="y" p={10}>
+                <Text ta="left" fz="xs" lh="xs" component="pre">
+                  {JSON.stringify(
+                    JSONPath({ path: jsonPath, json: state }),
+                    null,
+                    2
+                  )}
+                </Text>
+              </ScrollArea>
+            </Flex>
           </Tabs.Panel>
         </Tabs>
         <div
