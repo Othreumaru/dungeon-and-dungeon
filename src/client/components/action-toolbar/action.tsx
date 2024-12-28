@@ -19,7 +19,7 @@ export const Action = ({ action }: { action: UnitAction }) => {
         return;
       }
       testProgressRef.current += 0.1;
-      if (testProgressRef.current > action.cooldownSec) {
+      if (testProgressRef.current > action.cooldown * 100) {
         clearInterval(intervalRef.current);
         if (progressRef.current) {
           progressRef.current.style.top = "0%";
@@ -28,11 +28,11 @@ export const Action = ({ action }: { action: UnitAction }) => {
         return;
       }
       if (progressRef.current) {
-        progressRef.current.style.top = `${(1 - testProgressRef.current / action.cooldownSec) * 100}%`;
+        progressRef.current.style.top = `${(1 - (testProgressRef.current / action.cooldown) * 100) * 100}%`;
       }
     }, 100);
     return () => clearInterval(intervalRef.current);
-  }, [action.cooldownSec, action.state.type]);
+  }, [action.cooldown, action.state.type]);
 
   return (
     <div

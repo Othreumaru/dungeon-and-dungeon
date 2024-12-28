@@ -1,5 +1,5 @@
 import WebSocket, { WebSocketServer } from "ws";
-import { createFrameTickAction, type Actions } from "../protocol/actions.ts";
+import { type Actions } from "../protocol/actions.ts";
 import express from "express";
 import type { Request } from "express";
 import { ExpressAuth } from "@auth/express";
@@ -71,10 +71,9 @@ export const initServer = (engineApi: EngineApi) => {
 
   engineApi.onDispatch(broadcast);
 
-  setInterval(() => {
+  engineApi.onTick(() => {
     tickHandler(engineApi, serverApi);
-    engineApi.applyAction(createFrameTickAction(Date.now()), false);
-  }, 100);
+  });
 
   wss.on("connection", (ws) => {
     const session = (ws as UpgradedWebSocket).session;

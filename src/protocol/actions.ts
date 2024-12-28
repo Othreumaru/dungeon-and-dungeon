@@ -34,9 +34,6 @@ const ChatAction = z.object({
 
 const FrameTickAction = z.object({
   type: z.literal("action:frame-tick"),
-  payload: z.object({
-    frame: z.number(),
-  }),
 });
 
 const UnitSpawnAction = z.object({
@@ -94,11 +91,8 @@ export const createMoveAction = (
   },
 });
 
-export const createFrameTickAction = (frame: number): FrameTickAction => ({
+export const createFrameTickAction = (): FrameTickAction => ({
   type: "action:frame-tick",
-  payload: {
-    frame,
-  },
 });
 
 export const createUnitSpawnAction = (unit: Unit): UnitSpawnAction => ({

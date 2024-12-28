@@ -1,33 +1,29 @@
 import { aStarSolver } from "../../../libs/a-star-solver/a-star-solver.ts";
 import { distance2D } from "../../../libs/math/vector/distance.ts";
-import type { State, Unit } from "../../../protocol/state.ts";
 import { getPositionsAround, getUnitPosition } from "../../selectors.ts";
+import type { UnitTickContext } from "../unit-types.ts";
 
-export const stationaryAiToMoving = (
-  state: State,
-  unit: Unit,
-  frame: number
-): Unit => {
-  if (unit.state.type !== "stationary") {
-    return unit;
+export const stationaryAiToMoving = (ctx: UnitTickContext): UnitTickContext => {
+  if (ctx.unit.state.type !== "stationary") {
+    return ctx;
   }
-  if (unit.controller.type !== "ai") {
-    return unit;
+  if (ctx.unit.controller.type !== "ai") {
+    return ctx;
   }
-  const moveAction = unit.actions.find((action) => action.name === "move");
+  const moveAction = ctx.unit.actions.find((action) => action.name === "move");
   if (!moveAction || moveAction.state.type !== "ready") {
-    return unit;
+    return ctx;
   }
 
-  const playersByDistance = state.units
+  const playersByDistance = ctx.state.units
     .filter((unit) => unit.controller.type === "player")
     .map(
       (playerUnit) =>
         [
           playerUnit,
           distance2D(
-            getUnitPosition(playerUnit, frame)?.position,
-            getUnitPosition(unit, frame)?.position
+            getUnitPosition(playerUnit, ctx.state.tick),
+            getUnitPosition(ctx.unit, ctx.state.tick)
           ),
         ] as const
     )
@@ -35,22 +31,22 @@ export const stationaryAiToMoving = (
     .map(([playerUnit]) => playerUnit);
 
   if (playersByDistance.length === 0) {
-    return unit;
+    return ctx;
   }
 
   const targetPlayerUnit = playersByDistance[0];
 
-  const targetPosition = getUnitPosition(targetPlayerUnit, frame)?.position;
+  const targetPosition = getUnitPosition(targetPlayerUnit, ctx.state.tick);
 
   if (!targetPosition) {
-    return unit;
+    return ctx;
   }
 
   const inputGrid: boolean[][] = [...Array(12)].map(() =>
     [...Array(12)].map(() => true)
   );
 
-  state.units.forEach((unit) => {
+  ctx.state.units.forEach((unit) => {
     const position =
       unit.state.type === "stationary"
         ? unit.state.position
@@ -62,7 +58,7 @@ export const stationaryAiToMoving = (
     }
   });
 
-  const unitPosition = unit.state.position;
+  const unitPosition = ctx.unit.state.position;
 
   const paths = getPositionsAround(targetPosition, 1)
     .filter((position) => {
@@ -80,30 +76,36 @@ export const stationaryAiToMoving = (
     });
 
   if (paths.length === 0 || paths[0].length < 2) {
-    return unit;
+    return ctx;
   }
 
   return {
-    ...unit,
-    state: {
-      type: "moving",
-      startFrame: Date.now(),
-      endFrame: Date.now() + 2000,
-      path: paths[0],
-      lookAt: unit.state.lookAt,
+    ...ctx,
+    unit: {
+      ...ctx.unit,
+      state: {
+        type: "moving",
+        task: {
+          start: ctx.state.tick,
+          duration: 10 * paths[0].length,
+        },
+        path: paths[0],
+        lookAt: ctx.unit.state.lookAt,
+      },
+      actions: ctx.unit.actions.map((unitAction) => {
+        return unitAction.name === "move"
+          ? {
+              ...unitAction,
+              state: {
+                type: "cooldown",
+                task: {
+                  start: ctx.state.tick,
+                  duration: unitAction.cooldown,
+                },
+              },
+            }
+          : unitAction;
+      }),
     },
-    actions: unit.actions.map((unitAction) => {
-      return unitAction.name === "move"
-        ? {
-            name: "move",
-            cooldownSec: 2,
-            state: {
-              type: "cooldown",
-              startFrame: Date.now(),
-              endFrame: Date.now() + 2000,
-            },
-          }
-        : unitAction;
-    }),
   };
 };

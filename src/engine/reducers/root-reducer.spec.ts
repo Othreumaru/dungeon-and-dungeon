@@ -15,6 +15,8 @@ describe("reducer", () => {
 
   it("should handle move", () => {
     const initialState: State = {
+      tick: 0,
+      tickDurationMs: 100,
       units: [
         {
           id: "1",
@@ -73,6 +75,8 @@ describe("reducer", () => {
     const result = [moveAction].reduce(rootReducer, initialState);
 
     deepStrictEqual<State>(result, {
+      tick: 0,
+      tickDurationMs: 100,
       units: [
         {
           id: "1",
@@ -96,8 +100,10 @@ describe("reducer", () => {
                 y: 20,
               },
             },
-            startFrame: 100,
-            endFrame: 200,
+            task: {
+              start: 0,
+              duration: 10,
+            },
           },
           model: "skeleton-minion",
           actions: [],
@@ -129,28 +135,39 @@ describe("reducer", () => {
       ],
     });
 
-    const frameAction = createFrameTickAction(210);
+    const frameAction = createFrameTickAction();
 
     const result2 = [frameAction].reduce(rootReducer, result);
 
     deepStrictEqual<State>(result2, {
-      ...result,
+      tick: 1,
+      tickDurationMs: 100,
       units: [
         {
           id: "1",
           name: "unit1",
           state: {
-            type: "stationary",
-            position: {
-              x: 10,
-              y: 20,
-            },
+            type: "moving",
+            path: [
+              {
+                x: 0,
+                y: 0,
+              },
+              {
+                x: 10,
+                y: 20,
+              },
+            ],
             lookAt: {
               type: "target:position",
               position: {
-                x: 11,
+                x: 10,
                 y: 20,
               },
+            },
+            task: {
+              start: 0,
+              duration: 10,
             },
           },
           model: "skeleton-minion",

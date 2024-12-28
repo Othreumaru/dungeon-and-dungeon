@@ -1,60 +1,67 @@
 import { distance2D } from "../../../libs/math/vector/distance.ts";
-import type { State, Unit } from "../../../protocol/state.ts";
-import { getUnitPosition } from "../../selectors.ts";
+import { getUnitPosition, isTaskDone } from "../../selectors.ts";
+import type { UnitTickContext } from "../unit-types.ts";
 
 export const attackingMeleeToStationary = (
-  state: State,
-  unit: Unit,
-  frame: number
-): Unit => {
-  if (unit.state.type !== "attacking-melee") {
-    return unit;
+  ctx: UnitTickContext
+): UnitTickContext => {
+  if (ctx.unit.state.type !== "attacking-melee") {
+    return ctx;
   }
 
-  const targetUnitId = unit.state.targetUnitId;
-  const targetUnit = state.units.find((unit) => unit.id === targetUnitId);
+  const targetUnitId = ctx.unit.state.targetUnitId;
+  const targetUnit = ctx.state.units.find((unit) => unit.id === targetUnitId);
 
   if (!targetUnit) {
     return {
-      ...unit,
-      state: {
-        type: "stationary",
-        position: unit.state.position,
-        lookAt: unit.state.lookAt,
+      ...ctx,
+      unit: {
+        ...ctx.unit,
+        state: {
+          type: "stationary",
+          position: ctx.unit.state.position,
+          lookAt: ctx.unit.state.lookAt,
+        },
       },
     };
   }
   const distanceToTarget = distance2D(
-    unit.state.position,
-    getUnitPosition(targetUnit, frame)?.position
+    ctx.unit.state.position,
+    getUnitPosition(targetUnit, ctx.state.tick)
   );
 
   if (distanceToTarget > 1) {
     return {
-      ...unit,
-      state: {
-        type: "stationary",
-        position: unit.state.position,
-        lookAt: {
-          type: "target:unit",
-          unitId: targetUnitId,
+      ...ctx,
+      unit: {
+        ...ctx.unit,
+        state: {
+          type: "stationary",
+          position: ctx.unit.state.position,
+          lookAt: {
+            type: "target:unit",
+            unitId: targetUnitId,
+          },
         },
       },
     };
   }
 
-  if (unit.state.endFrame > frame) {
-    return unit;
+  if (!isTaskDone(ctx.unit.state.task, ctx.state.tick)) {
+    return ctx;
   }
 
   return {
-    ...unit,
-    state: {
-      type: "stationary",
-      position: unit.state.position,
-      lookAt: {
-        type: "target:unit",
-        unitId: targetUnitId,
+    ...ctx,
+    unit: {
+      ...ctx.unit,
+      state: {
+        type: "stationary",
+        position: ctx.unit.state.position,
+        lookAt: {
+          type: "target:unit",
+          unitId: targetUnitId,
+        },
       },
     },
   };

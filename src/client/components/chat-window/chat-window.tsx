@@ -70,7 +70,7 @@ export function ChatWindow() {
   });
 
   const eventEmitter = useServerContext();
-  const state = useContext(EngineContext);
+  const { state } = useContext(EngineContext);
   const [actions, setActions] = useState<Actions[]>([]);
   const messagesRef = useRef<HTMLDivElement | null>(null);
 

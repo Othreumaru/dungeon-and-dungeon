@@ -1,5 +1,10 @@
 import { z } from "zod";
 
+export const Task = z.object({
+  start: z.number(),
+  duration: z.number(),
+});
+
 export const DefendAndAttack = z.object({
   type: z.literal("defend-and-attack"),
   defendPosition: z.object({
@@ -11,15 +16,13 @@ export const DefendAndAttack = z.object({
 
 export const PatrolState = z.object({
   type: z.literal("patrol"),
-  startFrame: z.number(),
-  endFrame: z.number(),
+  task: Task,
 });
 
 export const AttackState = z.object({
   type: z.literal("attack"),
   target: z.string(),
-  startFrame: z.number(),
-  endFrame: z.number(),
+  task: Task,
 });
 
 export const PatrolAndAttackState = z.union([PatrolState, AttackState]);
@@ -72,8 +75,7 @@ export const StationaryUnit = z.object({
 
 export const MovingUnit = z.object({
   type: z.literal("moving"),
-  startFrame: z.number(),
-  endFrame: z.number(),
+  task: Task,
   path: z.array(
     z.object({
       x: z.number(),
@@ -90,8 +92,7 @@ export const AttackingMeleeUnit = z.object({
     y: z.number(),
   }),
   lookAt: LookAtTarget,
-  startFrame: z.number(),
-  endFrame: z.number(),
+  task: Task,
   targetUnitId: z.string(),
 });
 
@@ -103,8 +104,7 @@ export const UnitState = z.union([
 
 export const CooldownUnitActionState = z.object({
   type: z.literal("cooldown"),
-  startFrame: z.number(),
-  endFrame: z.number(),
+  task: Task,
 });
 
 export const ReadyUnitActionState = z.object({
@@ -118,7 +118,7 @@ export const UnitActionState = z.union([
 
 export const UnitAction = z.object({
   name: z.string(),
-  cooldownSec: z.number(),
+  cooldown: z.number(),
   state: UnitActionState,
 });
 
@@ -133,9 +133,12 @@ export const Unit = z.object({
 });
 
 export const State = z.object({
+  tick: z.number(),
+  tickDurationMs: z.number(),
   units: z.array(Unit),
 });
 
+export type Task = z.infer<typeof Task>;
 export type State = z.infer<typeof State>;
 export type Unit = z.infer<typeof Unit>;
 export type MovingUnit = z.infer<typeof MovingUnit>;
@@ -154,14 +157,14 @@ const defaultUnitController: UnitController = {
 const defaultUnitActions: UnitAction[] = [
   {
     name: "move",
-    cooldownSec: 4,
+    cooldown: 40,
     state: {
       type: "ready",
     },
   },
   {
     name: "attack",
-    cooldownSec: 2,
+    cooldown: 20,
     state: {
       type: "ready",
     },

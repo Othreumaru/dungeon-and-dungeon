@@ -1,9 +1,10 @@
 import type { Actions } from "../../protocol/actions.ts";
 import type { State } from "../../protocol/state.ts";
-import { getUnchangedObject } from "./compare-and-return.ts";
 import { frameTickReducer } from "./frame-tick-reducer.ts";
 
 export const initialState: State = {
+  tick: 0,
+  tickDurationMs: 100,
   units: [],
 };
 
@@ -31,8 +32,10 @@ export const rootReducer = (
                       ...action,
                       state: {
                         type: "cooldown",
-                        startFrame: Date.now(),
-                        endFrame: Date.now() + action.cooldownSec * 1000,
+                        task: {
+                          start: state.tick,
+                          duration: action.cooldown,
+                        },
                       },
                     };
                   }
@@ -40,8 +43,10 @@ export const rootReducer = (
                 }),
                 state: {
                   type: "moving",
-                  startFrame: action.payload.startFrame,
-                  endFrame: action.payload.endFrame,
+                  task: {
+                    start: state.tick,
+                    duration: 10 * action.payload.path.length,
+                  },
                   path: [
                     {
                       x: unit.state.position.x,
@@ -63,13 +68,10 @@ export const rootReducer = (
       return state;
     case "action:frame-tick": {
       const unitIds = state.units.map((unit) => unit.id);
-
-      return getUnchangedObject(
-        state,
-        unitIds.reduce((state, unitId) => {
-          return frameTickReducer(state, action, unitId);
-        }, state)
-      );
+      return unitIds.reduce(frameTickReducer, {
+        ...state,
+        tick: state.tick + 1,
+      });
     }
     case "action:unit-spawn":
       return {

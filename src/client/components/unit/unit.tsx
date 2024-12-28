@@ -69,9 +69,13 @@ export const Loop = ({
 const MovingComponent = ({
   unit,
   unitRef,
+  tickDurationMs,
+  serverStartTime,
 }: {
   unit: MovingUnit;
   unitRef: React.MutableRefObject<THREE.Object3D>;
+  tickDurationMs: number;
+  serverStartTime: number;
 }) => {
   // console.log("moving component render");
 
@@ -108,6 +112,9 @@ const MovingComponent = ({
     };
   }, [unit, unitRef]);
 
+  const startFrame = serverStartTime + unit.task.start * tickDurationMs;
+  const endFrame = startFrame + unit.task.duration * tickDurationMs;
+
   return (
     <MotionPathControls
       debug={true}
@@ -117,7 +124,7 @@ const MovingComponent = ({
       curves={curves}
       position={[0, 0.2, 0]}
     >
-      <Loop startFrame={unit.startFrame} endFrame={unit.endFrame} />
+      <Loop startFrame={startFrame} endFrame={endFrame} />
     </MotionPathControls>
   );
 };
@@ -144,7 +151,15 @@ const CameraText = ({ text }: { text: string }) => {
   );
 };
 
-const UnitComponent = ({ unit }: { unit: UnitType; now?: number }) => {
+const UnitComponent = ({
+  unit,
+  tickDurationMs,
+  serverStartTime,
+}: {
+  unit: UnitType;
+  tickDurationMs: number;
+  serverStartTime: number;
+}) => {
   const unitRef = useRef<THREE.Group>(null);
   const audioRef = useRef<THREE.PositionalAudio>(null);
   const unitApiRef = useRef<{
@@ -256,6 +271,8 @@ const UnitComponent = ({ unit }: { unit: UnitType; now?: number }) => {
         <MovingComponent
           unitRef={unitRef as React.MutableRefObject<THREE.Object3D>}
           unit={unit.state}
+          tickDurationMs={tickDurationMs}
+          serverStartTime={serverStartTime}
         />
       )}
     </group>

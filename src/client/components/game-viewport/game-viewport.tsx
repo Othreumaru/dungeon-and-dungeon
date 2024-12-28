@@ -5,7 +5,7 @@ import { Unit } from "../unit/unit";
 import { EngineContext } from "../../engine-context";
 
 export const GameViewport = () => {
-  const state = useContext(EngineContext);
+  const { state, serverStartTime } = useContext(EngineContext);
 
   // console.log("rendering game viewport");
 
@@ -34,7 +34,12 @@ export const GameViewport = () => {
       <pointLight position={[-10, -10, -10]} decay={0} intensity={Math.PI} />
       <group position={[0.5, 0, 0.5]}>
         {state.units.map((unit) => (
-          <Unit key={unit.id} unit={unit} />
+          <Unit
+            key={unit.id}
+            unit={unit}
+            tickDurationMs={state.tickDurationMs}
+            serverStartTime={serverStartTime}
+          />
         ))}
       </group>
       <Board />
