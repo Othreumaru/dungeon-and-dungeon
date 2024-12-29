@@ -16,6 +16,13 @@ export const ChatRequest = z.object({
   }),
 });
 
+export const SyncRequest = z.object({
+  type: z.literal("request:sync"),
+  payload: z.object({
+    tick: z.number(),
+  }),
+});
+
 export const ClientRequests = z.union([MoveRequest, ChatRequest]);
 
 export type MoveRequest = z.infer<typeof MoveRequest>;

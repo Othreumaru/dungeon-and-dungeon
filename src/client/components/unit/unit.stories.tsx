@@ -65,9 +65,9 @@ export default {
   },
 };
 
-const Template: StoryFn<{ now: number; unit: UnitType }> = ({ now, unit }) => (
+const Template: StoryFn<{ now: number; unit: UnitType }> = ({ unit }) => (
   <>
-    <Unit now={now} unit={unit} />
+    <Unit unit={unit} tickDurationMs={100} serverStartTime={0} />
   </>
 );
 
@@ -79,8 +79,10 @@ Sample1.args = {
     name: "unit1",
     state: {
       type: "moving",
-      startFrame: 0,
-      endFrame: 500,
+      task: {
+        start: 0,
+        duration: 500,
+      },
       path: [
         {
           x: 0,

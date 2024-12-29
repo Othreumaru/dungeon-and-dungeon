@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import EventEmitter from "eventemitter3";
 import { Actions } from "../../protocol/actions";
 import { useUserId } from "./use-user-id";
@@ -7,6 +7,7 @@ export const useServer = () => {
   const { setUserId } = useUserId();
   const socketRef = useRef<WebSocket | null>(null);
   const eventEmitter = useMemo(() => new EventEmitter(), []);
+  const [syncRequestTimestamp, setSyncRequestTimestamp] = useState(0);
 
   useEffect(() => {
     if (socketRef.current !== null) {
@@ -21,12 +22,30 @@ export const useServer = () => {
       try {
         const action: Actions = JSON.parse(event.data);
         if (action.type === "action:sync") {
+          const now = Date.now();
+          const latency = (now - syncRequestTimestamp) / 2;
+          console.log(`latency: ${latency}ms`);
+          const serverTime = action.payload.serverTime + latency;
+          const offset = serverTime - now;
+          console.log(`offset: ${offset}ms`);
           setUserId(action.payload.userId);
         }
         eventEmitter.emit("message", action);
       } catch (error) {
         console.error(error);
       }
+    };
+
+    socket.onopen = () => {
+      setSyncRequestTimestamp(Date.now());
+      socket.send(
+        JSON.stringify({
+          type: "request:sync",
+          payload: {
+            tick: 0,
+          },
+        })
+      );
     };
 
     socket.onclose = () => {

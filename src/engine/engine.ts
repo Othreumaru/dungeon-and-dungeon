@@ -7,6 +7,7 @@ import { createFrameTickAction } from "../protocol/actions.ts";
 export type EngineApi = {
   applyAction: (action: Actions, emit: boolean) => void;
   getState: () => State;
+  getServerStartTime: () => Date;
   onDispatch: (callback: (action: Actions) => void) => void;
   offDispatch: (callback: (action: Actions) => void) => void;
   onTick: (callback: () => void) => void;
@@ -17,7 +18,8 @@ export const initEngine = () => {
   const eventEmitter: EventEmitter = new EventEmitter();
   let state: State = initialState;
   const serverStartTime = getServerStartTime();
-  console.log("Server wngine will start at: ", serverStartTime.toISOString());
+  let totalTimeProcessed = 0;
+  console.log("Server engine will start at: ", serverStartTime.toISOString());
 
   const api: EngineApi = {
     applyAction: (action, emit = true) => {
@@ -39,19 +41,26 @@ export const initEngine = () => {
     offTick: (callback) => {
       eventEmitter.off("tick", callback);
     },
+    getServerStartTime: () => serverStartTime,
   };
 
-  setInterval(() => {
-    const ticksSinceStart = Math.floor(
-      (Date.now() - serverStartTime.getTime()) / 100
-    );
-    console.log("Server engine tick: ", ticksSinceStart);
-    for (let i = 0; i < ticksSinceStart; i++) {
+  const tick = () => {
+    const now = new Date();
+    const prevTickTime = serverStartTime.getTime() + totalTimeProcessed;
+    let timeToProcess = prevTickTime - now.getTime();
+    console.log(now, ": Server engine tick processing time: ", timeToProcess);
+    while (timeToProcess > state.tickDurationMs) {
+      timeToProcess -= state.tickDurationMs;
+      totalTimeProcessed += state.tickDurationMs;
       eventEmitter.emit("tick");
       api.applyAction(createFrameTickAction(), false);
     }
-    eventEmitter.emit("tick");
-  }, 100);
+    const nextTickTime = state.tickDurationMs - timeToProcess;
+    console.log(now, ": Server engine next tick in: ", nextTickTime);
+    setTimeout(tick, nextTickTime);
+  };
+
+  setTimeout(tick, serverStartTime.getTime() - Date.now());
 
   return api;
 };

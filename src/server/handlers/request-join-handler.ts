@@ -38,7 +38,11 @@ export const requestJoinHandler = (
 ) => {
   const state = engineApi.getState();
   const userId = playerContext.userId;
-  const syncAction = createSyncAction(userId, state);
+  const syncAction = createSyncAction(
+    userId,
+    state,
+    engineApi.getServerStartTime().getTime()
+  );
   const randomPosition = {
     x: Math.floor(Math.random() * 9),
     y: Math.floor(Math.random() * 9),

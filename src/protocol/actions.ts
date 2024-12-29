@@ -6,6 +6,7 @@ export const SyncAction = z.object({
   payload: z.object({
     userId: z.string(),
     state: State,
+    serverTime: z.number(),
   }),
 });
 
@@ -68,11 +69,16 @@ type UnitDespawnAction = z.infer<typeof UnitDespawnAction>;
 
 export type Actions = z.infer<typeof Actions>;
 
-export const createSyncAction = (userId: string, state: State): SyncAction => ({
+export const createSyncAction = (
+  userId: string,
+  state: State,
+  serverTime: number
+): SyncAction => ({
   type: "action:sync",
   payload: {
     userId,
     state,
+    serverTime,
   },
 });
 

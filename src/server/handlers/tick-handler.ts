@@ -35,8 +35,10 @@ export const tickHandler = (engineApi: EngineApi, serverApi: ServerApi) => {
             attackRange: 10,
             state: {
               type: "patrol",
-              startFrame: Date.now(),
-              endFrame: Date.now() + 2000,
+              task: {
+                start: 0,
+                duration: 500,
+              },
             },
           },
         },
