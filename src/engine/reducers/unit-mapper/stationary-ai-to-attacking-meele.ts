@@ -18,15 +18,15 @@ export const stationaryAiToAttackingMeele = (
     return ctx;
   }
 
-  const playersByDistance = ctx.state.units
+  const playersByDistance = ctx.rootState.state.units
     .filter((unit) => unit.controller.type === "player")
     .map(
       (playerUnit) =>
         [
           playerUnit,
           distance2D(
-            getUnitPosition(playerUnit, ctx.state.tick),
-            getUnitPosition(ctx.unit, ctx.state.tick)
+            getUnitPosition(playerUnit, ctx.rootState.tick),
+            getUnitPosition(ctx.unit, ctx.rootState.tick)
           ),
         ] as const
     )
@@ -56,7 +56,7 @@ export const stationaryAiToAttackingMeele = (
           unitId: targetPlayerUnit[0].id,
         },
         task: {
-          start: ctx.state.tick,
+          start: ctx.rootState.tick,
           duration: attackAction.cooldown,
         },
         targetUnitId: targetPlayerUnit[0].id,
@@ -68,7 +68,7 @@ export const stationaryAiToAttackingMeele = (
             state: {
               type: "cooldown",
               task: {
-                start: ctx.state.tick,
+                start: ctx.rootState.tick,
                 duration: attackAction.cooldown,
               },
             },

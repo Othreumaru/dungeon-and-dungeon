@@ -23,7 +23,7 @@ export const SyncRequest = z.object({
   }),
 });
 
-export const ClientRequests = z.union([MoveRequest, ChatRequest]);
+export const ClientRequests = z.union([MoveRequest, ChatRequest, SyncRequest]);
 
 export type MoveRequest = z.infer<typeof MoveRequest>;
 export type ChatRequest = z.infer<typeof ChatRequest>;

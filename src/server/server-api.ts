@@ -1,8 +1,9 @@
-import type { Actions } from "../protocol/actions.ts";
+import { Responses } from "../protocol/responses.ts";
 
 export type ServerApi = {
-  broadcast: (action: Actions) => void;
-  send: (userId: string, action: Actions) => void;
+  broadcast: (action: Responses) => void;
+  send: (userId: string, action: Responses) => void;
+  sync: (userId: string) => void;
 };
 
 export type Session = {

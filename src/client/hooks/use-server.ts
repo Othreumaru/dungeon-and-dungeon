@@ -1,13 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import EventEmitter from "eventemitter3";
-import { Actions } from "../../protocol/actions";
 import { useUserId } from "./use-user-id";
+import { Responses } from "../../protocol/responses";
 
 export const useServer = () => {
   const { setUserId } = useUserId();
   const socketRef = useRef<WebSocket | null>(null);
   const eventEmitter = useMemo(() => new EventEmitter(), []);
-  const [syncRequestTimestamp, setSyncRequestTimestamp] = useState(0);
+  const syncRequestTimestampRef = useRef<number>(0);
 
   useEffect(() => {
     if (socketRef.current !== null) {
@@ -20,24 +20,31 @@ export const useServer = () => {
     socket.onmessage = (event) => {
       console.log(`received: ${event.data}`);
       try {
-        const action: Actions = JSON.parse(event.data);
-        if (action.type === "action:sync") {
+        const action: Responses = JSON.parse(event.data);
+        if (action.type === "response:sync") {
           const now = Date.now();
-          const latency = (now - syncRequestTimestamp) / 2;
+          const requestResponseTime = now - syncRequestTimestampRef.current;
+          const latency = requestResponseTime / 2;
           console.log(`latency: ${latency}ms`);
-          const serverTime = action.payload.serverTime + latency;
-          const offset = serverTime - now;
+          const serverTime = action.payload.serverCurrentTime + latency;
+
+          const offset = serverTime - now - latency;
+          const serverStartTimeInLocalTime = serverTime - offset;
           console.log(`offset: ${offset}ms`);
           setUserId(action.payload.userId);
+          eventEmitter.emit("sync", {
+            state: action.payload.state,
+            serverStartTimeInLocalTime,
+          });
         }
-        eventEmitter.emit("message", action);
+        eventEmitter.emit("response", action);
       } catch (error) {
         console.error(error);
       }
     };
 
     socket.onopen = () => {
-      setSyncRequestTimestamp(Date.now());
+      syncRequestTimestampRef.current = Date.now();
       socket.send(
         JSON.stringify({
           type: "request:sync",

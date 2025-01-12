@@ -1,3 +1,3 @@
-import type { State, Unit } from "../../protocol/state";
+import type { RootState, Unit } from "../../protocol/state";
 
-export type UnitTickContext = { state: State; unit: Unit };
+export type UnitTickContext = { rootState: RootState; unit: Unit };

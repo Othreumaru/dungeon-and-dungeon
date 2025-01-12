@@ -10,7 +10,9 @@ export const attackingMeleeToStationary = (
   }
 
   const targetUnitId = ctx.unit.state.targetUnitId;
-  const targetUnit = ctx.state.units.find((unit) => unit.id === targetUnitId);
+  const targetUnit = ctx.rootState.state.units.find(
+    (unit) => unit.id === targetUnitId
+  );
 
   if (!targetUnit) {
     return {
@@ -27,7 +29,7 @@ export const attackingMeleeToStationary = (
   }
   const distanceToTarget = distance2D(
     ctx.unit.state.position,
-    getUnitPosition(targetUnit, ctx.state.tick)
+    getUnitPosition(targetUnit, ctx.rootState.tick)
   );
 
   if (distanceToTarget > 1) {
@@ -47,7 +49,7 @@ export const attackingMeleeToStationary = (
     };
   }
 
-  if (!isTaskDone(ctx.unit.state.task, ctx.state.tick)) {
+  if (!isTaskDone(ctx.unit.state.task, ctx.rootState.tick)) {
     return ctx;
   }
 

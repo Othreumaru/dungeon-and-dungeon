@@ -2,7 +2,7 @@ import { isUnitDoneMoving } from "../../selectors.ts";
 import type { UnitTickContext } from "../unit-types.ts";
 
 export const movingToStationary = (ctx: UnitTickContext): UnitTickContext => {
-  if (!isUnitDoneMoving(ctx.unit, ctx.state.tick)) {
+  if (!isUnitDoneMoving(ctx.unit, ctx.rootState.tick)) {
     return ctx;
   }
   const path = ctx.unit.state.path;
@@ -18,7 +18,7 @@ export const movingToStationary = (ctx: UnitTickContext): UnitTickContext => {
             state: {
               type: "cooldown",
               task: {
-                start: ctx.state.tick,
+                start: ctx.rootState.tick,
                 duration: unitAction.cooldown,
               },
             },

@@ -5,42 +5,8 @@ export const Task = z.object({
   duration: z.number(),
 });
 
-export const DefendAndAttack = z.object({
-  type: z.literal("defend-and-attack"),
-  defendPosition: z.object({
-    x: z.number(),
-    y: z.number(),
-  }),
-  attackRange: z.number(),
-});
-
-export const PatrolState = z.object({
-  type: z.literal("patrol"),
-  task: Task,
-});
-
-export const AttackState = z.object({
-  type: z.literal("attack"),
-  target: z.string(),
-  task: Task,
-});
-
-export const PatrolAndAttackState = z.union([PatrolState, AttackState]);
-
-export const PatrolAndAttack = z.object({
-  type: z.literal("patrol-and-attack"),
-  attackRange: z.number(),
-  state: PatrolAndAttackState,
-});
-
-export const AiUnitControllerAlgorithm = z.union([
-  PatrolAndAttack,
-  DefendAndAttack,
-]);
-
 export const AiUnitController = z.object({
   type: z.literal("ai"),
-  algorithm: AiUnitControllerAlgorithm,
 });
 
 export const PlayerUnitController = z.object({
@@ -133,13 +99,19 @@ export const Unit = z.object({
 });
 
 export const State = z.object({
-  tick: z.number(),
   tickDurationMs: z.number(),
   units: z.array(Unit),
 });
 
+export const RootState = z.object({
+  tick: z.number(),
+  hash: z.string(),
+  state: State,
+});
+
 export type Task = z.infer<typeof Task>;
 export type State = z.infer<typeof State>;
+export type RootState = z.infer<typeof RootState>;
 export type Unit = z.infer<typeof Unit>;
 export type MovingUnit = z.infer<typeof MovingUnit>;
 export type StationaryUnit = z.infer<typeof StationaryUnit>;

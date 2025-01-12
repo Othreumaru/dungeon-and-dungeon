@@ -3,6 +3,7 @@ import type { EngineApi } from "../../engine/engine.ts";
 import { aStarSolver } from "../../libs/a-star-solver/a-star-solver.ts";
 import type { MoveRequest } from "../../protocol/requests.ts";
 import type { PlayerContext, ServerApi } from "../server-api.ts";
+import { createActionsResponse } from "../../protocol/responses.ts";
 
 export const requestMoveHandler = (
   data: MoveRequest,
@@ -11,8 +12,8 @@ export const requestMoveHandler = (
   serverApi: ServerApi
 ) => {
   const unitId = playerContext.userId;
-  const state = engineApi.getState();
-  const unit = state.units.find((unit) => unit.id === unitId);
+  const rootState = engineApi.getState();
+  const unit = rootState.state.units.find((unit) => unit.id === unitId);
   if (!unit) {
     console.warn(`Unit "${unitId}" not found`);
     return;
@@ -38,5 +39,6 @@ export const requestMoveHandler = (
       y: point.y,
     }))
   );
-  serverApi.broadcast(action);
+  const { tick, index } = engineApi.scheduleAction(action);
+  serverApi.broadcast(createActionsResponse(tick, index, action));
 };

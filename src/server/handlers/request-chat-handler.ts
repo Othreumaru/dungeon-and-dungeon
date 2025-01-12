@@ -1,7 +1,7 @@
-import { createChatAction } from "../../protocol/actions.ts";
 import type { EngineApi } from "../../engine/engine.ts";
 import type { ChatRequest } from "../../protocol/requests.ts";
 import type { PlayerContext, ServerApi } from "../server-api.ts";
+import { createChatResponse } from "../../protocol/responses.ts";
 
 export const requestChatHandler = (
   request: ChatRequest,
@@ -10,6 +10,6 @@ export const requestChatHandler = (
   serverApi: ServerApi
 ) => {
   serverApi.broadcast(
-    createChatAction(playerContext.userId, request.payload.message)
+    createChatResponse(playerContext.userId, request.payload.message)
   );
 };

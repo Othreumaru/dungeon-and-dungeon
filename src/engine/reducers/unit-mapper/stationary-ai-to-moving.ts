@@ -15,15 +15,15 @@ export const stationaryAiToMoving = (ctx: UnitTickContext): UnitTickContext => {
     return ctx;
   }
 
-  const playersByDistance = ctx.state.units
+  const playersByDistance = ctx.rootState.state.units
     .filter((unit) => unit.controller.type === "player")
     .map(
       (playerUnit) =>
         [
           playerUnit,
           distance2D(
-            getUnitPosition(playerUnit, ctx.state.tick),
-            getUnitPosition(ctx.unit, ctx.state.tick)
+            getUnitPosition(playerUnit, ctx.rootState.tick),
+            getUnitPosition(ctx.unit, ctx.rootState.tick)
           ),
         ] as const
     )
@@ -36,7 +36,7 @@ export const stationaryAiToMoving = (ctx: UnitTickContext): UnitTickContext => {
 
   const targetPlayerUnit = playersByDistance[0];
 
-  const targetPosition = getUnitPosition(targetPlayerUnit, ctx.state.tick);
+  const targetPosition = getUnitPosition(targetPlayerUnit, ctx.rootState.tick);
 
   if (!targetPosition) {
     return ctx;
@@ -46,7 +46,7 @@ export const stationaryAiToMoving = (ctx: UnitTickContext): UnitTickContext => {
     [...Array(12)].map(() => true)
   );
 
-  ctx.state.units.forEach((unit) => {
+  ctx.rootState.state.units.forEach((unit) => {
     const position =
       unit.state.type === "stationary"
         ? unit.state.position
@@ -86,7 +86,7 @@ export const stationaryAiToMoving = (ctx: UnitTickContext): UnitTickContext => {
       state: {
         type: "moving",
         task: {
-          start: ctx.state.tick,
+          start: ctx.rootState.tick,
           duration: 10 * paths[0].length,
         },
         path: paths[0],
@@ -99,7 +99,7 @@ export const stationaryAiToMoving = (ctx: UnitTickContext): UnitTickContext => {
               state: {
                 type: "cooldown",
                 task: {
-                  start: ctx.state.tick,
+                  start: ctx.rootState.tick,
                   duration: unitAction.cooldown,
                 },
               },
