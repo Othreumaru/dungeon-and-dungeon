@@ -1,3 +1,4 @@
+import { Canvas } from "@react-three/fiber";
 import "./app.css";
 import { ActionToolbar } from "./components/action-toolbar/action-toolbar";
 import { ChatWindow } from "./components/chat-window/chat-window";
@@ -27,7 +28,20 @@ function App() {
   return (
     <ServerContextProvider>
       <EngineContextProvider>
-        <GameViewport />
+        <Canvas
+          shadows={true}
+          style={{
+            width: "100%",
+            height: "100%",
+            position: "absolute",
+            top: 0,
+            left: 0,
+            background: "lightgray",
+          }}
+          camera={{ position: [5, 6, 12], rotation: [1.7 * Math.PI, 0, 0] }}
+        >
+          <GameViewport />
+        </Canvas>
         <ChatWindow />
         <ActionToolbar />
       </EngineContextProvider>

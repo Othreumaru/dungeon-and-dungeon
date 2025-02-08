@@ -23,9 +23,9 @@ import {
 import { useDrag } from "../../hooks/use-drag";
 import { useElementSize, useLocalStorage } from "@mantine/hooks";
 import { useContext, useEffect, useRef, useState } from "react";
-import { Actions } from "../../../protocol/actions";
 import { useServerContext } from "../../hooks/use-server-context";
 import { JSONPath } from "jsonpath-plus";
+import { Responses } from "../../../protocol/responses";
 
 export function ChatWindow() {
   const { ref: resizeRef } = useElementSize();
@@ -70,12 +70,12 @@ export function ChatWindow() {
   });
 
   const eventEmitter = useServerContext();
-  const state = useContext(EngineContext);
-  const [actions, setActions] = useState<Actions[]>([]);
+  const { rootState } = useContext(EngineContext);
+  const [actions, setActions] = useState<Responses[]>([]);
   const messagesRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const fn = (action: Actions) => {
+    const fn = (action: Responses) => {
       setActions((prev) => [...prev, action]);
       setTimeout(() => {
         if (messagesRef.current) {
@@ -83,9 +83,9 @@ export function ChatWindow() {
         }
       }, 50);
     };
-    eventEmitter.on("message", fn);
+    eventEmitter.on("reponse", fn);
     return () => {
-      eventEmitter.off("message", fn);
+      eventEmitter.off("response", fn);
     };
   }, [eventEmitter]);
 
@@ -150,7 +150,7 @@ export function ChatWindow() {
               <ScrollArea w={"100%"} h={"100%"}>
                 <Flex direction="column" p={10}>
                   {actions
-                    .filter((action) => action.type === "action:chat")
+                    .filter((action) => action.type === "response:chat")
                     .map((message, index) => (
                       <Text
                         key={index}
@@ -159,13 +159,13 @@ export function ChatWindow() {
                         ta="left"
                         style={{
                           color:
-                            state.units.find(
+                            rootState.state.units.find(
                               (unit) => unit.id === message.payload.userId
                             )?.color ?? "black",
                         }}
                       >
                         {`${
-                          state.units.find(
+                          rootState.state.units.find(
                             (unit) => unit.id === message.payload.userId
                           )?.name ?? "Unknown"
                         }: ${message.payload.message}`}
@@ -212,7 +212,7 @@ export function ChatWindow() {
               <ScrollArea w={"100%"} h={"100%"} scrollbars="y" p={10}>
                 <Text ta="left" fz="xs" lh="xs" component="pre">
                   {JSON.stringify(
-                    JSONPath({ path: jsonPath, json: state }),
+                    JSONPath({ path: jsonPath, json: rootState }),
                     null,
                     2
                   )}

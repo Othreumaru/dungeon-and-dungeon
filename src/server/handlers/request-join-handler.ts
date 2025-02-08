@@ -1,10 +1,8 @@
-import {
-  createSyncAction,
-  createUnitSpawnAction,
-} from "../../protocol/actions.ts";
+import { createUnitSpawnAction } from "../../protocol/actions.ts";
 import type { PlayerContext, ServerApi } from "../server-api.ts";
 import type { EngineApi } from "../../engine/engine.ts";
 import { createUnit } from "../../protocol/state.ts";
+import { createActionsResponse } from "../../protocol/responses.ts";
 
 const colors = [
   "blue",
@@ -36,9 +34,7 @@ export const requestJoinHandler = (
   engineApi: EngineApi,
   serverApi: ServerApi
 ) => {
-  const state = engineApi.getState();
   const userId = playerContext.userId;
-  const syncAction = createSyncAction(userId, state);
   const randomPosition = {
     x: Math.floor(Math.random() * 9),
     y: Math.floor(Math.random() * 9),
@@ -62,6 +58,7 @@ export const requestJoinHandler = (
       color: colors[Math.floor(Math.random() * colors.length)],
     })
   );
-  serverApi.send(userId, syncAction);
-  serverApi.broadcast(spawnAction);
+  serverApi.sync(userId);
+  const { tick, index } = engineApi.scheduleAction(spawnAction);
+  serverApi.broadcast(createActionsResponse(tick, index, spawnAction));
 };

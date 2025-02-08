@@ -1,5 +1,4 @@
 import WebSocket, { WebSocketServer } from "ws";
-import { createFrameTickAction, type Actions } from "../protocol/actions.ts";
 import express from "express";
 import type { Request } from "express";
 import { ExpressAuth } from "@auth/express";
@@ -14,12 +13,15 @@ import { requestJoinHandler } from "./handlers/request-join-handler.ts";
 import type { PlayerContext, ServerApi, Session } from "./server-api.ts";
 import { requestChatHandler } from "./handlers/request-chat-handler.ts";
 import { requestLeaveHandler } from "./handlers/request-leave-handler.ts";
-import { tickHandler } from "./handlers/tick-handler.ts";
 import { ClientRequests } from "../protocol/requests.ts";
+import { createSyncResponse } from "../protocol/responses.ts";
+import type { Responses } from "../protocol/responses.ts";
+import fs from "node:fs/promises";
 
 type UpgradedWebSocket = WebSocket & PlayerContext;
 
 const PORT = process.env.PORT || 80;
+const LOG_FILE = "./log.ndjson";
 
 const hashStr = (str: string) => {
   const hash = crypto.createHash("md5").update(str).digest("hex");
@@ -28,7 +30,13 @@ const hashStr = (str: string) => {
 
 const expressAuthConfig: ExpressAuthConfig = { providers: [GitHub] };
 
-export const initServer = (engineApi: EngineApi) => {
+const log = (message: string) => {
+  const timestamp = new Date().toISOString();
+  console.log(`${timestamp}: ${message}`);
+};
+
+export const initServer = async (engineApi: EngineApi) => {
+  await fs.truncate(LOG_FILE, 0);
   const app = express();
   app.set("trust proxy", true);
   app.use(express.static("dist"));
@@ -40,10 +48,9 @@ export const initServer = (engineApi: EngineApi) => {
 
   const wss = new WebSocketServer({ noServer: true });
 
-  const broadcast = (data: Actions) => {
-    engineApi.applyAction(data, false);
+  const broadcast = (data: Responses) => {
     const buffer = JSON.stringify(data, null, 2);
-    console.log("broadcasting", buffer);
+    log(`broadcasting: ${data.type}`);
     wss.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
         client.send(buffer);
@@ -51,9 +58,30 @@ export const initServer = (engineApi: EngineApi) => {
     });
   };
 
-  const send = (userId: string, data: Actions) => {
+  const send = (userId: string, data: Responses) => {
     const buffer = JSON.stringify(data);
-    console.log("sending", buffer);
+    log(`sending to ${userId}: ${data.type}`);
+    wss.clients.forEach((client) => {
+      if (
+        client.readyState === WebSocket.OPEN &&
+        (client as UpgradedWebSocket).userId === userId
+      ) {
+        client.send(buffer);
+      }
+    });
+  };
+
+  const sync = (userId: string) => {
+    const state = engineApi.getState();
+    const serverStartTime = engineApi.getServerStartTime().getTime();
+    const syncResponse = createSyncResponse(
+      userId,
+      state,
+      Date.now(),
+      serverStartTime
+    );
+    const buffer = JSON.stringify(syncResponse);
+    log(`syncing ${userId} state ${state.hash} with time ${serverStartTime}`);
     wss.clients.forEach((client) => {
       if (
         client.readyState === WebSocket.OPEN &&
@@ -67,14 +95,18 @@ export const initServer = (engineApi: EngineApi) => {
   const serverApi: ServerApi = {
     broadcast,
     send,
+    sync,
   };
 
-  engineApi.onDispatch(broadcast);
-
-  setInterval(() => {
-    tickHandler(engineApi, serverApi);
-    engineApi.applyAction(createFrameTickAction(Date.now()), false);
-  }, 100);
+  engineApi.onTick(({ timestamp, action }) => {
+    fs.appendFile(
+      LOG_FILE,
+      `${JSON.stringify({
+        timestamp: timestamp.toISOString(),
+        action,
+      })}\n`
+    );
+  });
 
   wss.on("connection", (ws) => {
     const session = (ws as UpgradedWebSocket).session;

@@ -1,20 +1,26 @@
-import type { Actions } from "../../protocol/actions.ts";
-import type { State } from "../../protocol/state.ts";
-import { getUnchangedObject } from "./compare-and-return.ts";
+import type { RootActions } from "../../protocol/actions.ts";
+import type { RootState } from "../../protocol/state.ts";
+import { getUnchangedArray, getUnchangedObject } from "./compare-and-return.ts";
 import { frameTickReducer } from "./frame-tick-reducer.ts";
+import { spawnUnits } from "./generators/spawn-units.ts";
 
-export const initialState: State = {
-  units: [],
+export const initialState: RootState = {
+  tick: 0,
+  hash: "",
+  state: {
+    tickDurationMs: 1000,
+    units: [],
+  },
 };
 
 export const rootReducer = (
-  state: State = initialState,
-  action: Actions
-): State => {
+  rootState: RootState = initialState,
+  action: RootActions
+): RootState => {
   switch (action.type) {
     case "action:sync":
       return action.payload.state;
-    case "action:move":
+    /* case "action:move":
       return {
         ...state,
         units: state.units.map((unit) =>
@@ -31,8 +37,10 @@ export const rootReducer = (
                       ...action,
                       state: {
                         type: "cooldown",
-                        startFrame: Date.now(),
-                        endFrame: Date.now() + action.cooldownSec * 1000,
+                        task: {
+                          start: state.tick,
+                          duration: action.cooldown,
+                        },
                       },
                     };
                   }
@@ -40,8 +48,10 @@ export const rootReducer = (
                 }),
                 state: {
                   type: "moving",
-                  startFrame: action.payload.startFrame,
-                  endFrame: action.payload.endFrame,
+                  task: {
+                    start: state.tick,
+                    duration: 10 * action.payload.path.length,
+                  },
                   path: [
                     {
                       x: unit.state.position.x,
@@ -59,29 +69,39 @@ export const rootReducer = (
             : unit
         ),
       };
-    case "action:chat":
+      */
+    /*case "action:chat":
       return state;
+      */
     case "action:frame-tick": {
-      const unitIds = state.units.map((unit) => unit.id);
+      const unitIds = rootState.state.units.map((unit) => unit.id);
+      const newState = unitIds.reduce(frameTickReducer, {
+        ...rootState,
+        tick: rootState.tick + 1,
+        hash: action.payload.prevStateHash,
+        state: getUnchangedObject(rootState.state, {
+          ...rootState.state,
+          units: getUnchangedArray(
+            rootState.state.units,
+            rootState.state.units.concat(spawnUnits(rootState))
+          ),
+        }),
+      });
 
-      return getUnchangedObject(
-        state,
-        unitIds.reduce((state, unitId) => {
-          return frameTickReducer(state, action, unitId);
-        }, state)
-      );
+      return newState;
     }
-    case "action:unit-spawn":
+    /*case "action:unit-spawn":
       return {
         ...state,
         units: [...state.units, action.payload.unit],
       };
-    case "action:unit-despawn":
+      */
+    /*case "action:unit-despawn":
       return {
         ...state,
         units: state.units.filter((unit) => unit.id !== action.payload.unitId),
-      };
+      };*/
     default:
-      return state;
+      return rootState;
   }
 };
