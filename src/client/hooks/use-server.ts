@@ -2,6 +2,12 @@ import { useEffect, useMemo, useRef } from "react";
 import EventEmitter from "eventemitter3";
 import { useUserId } from "./use-user-id";
 import { Responses } from "../../protocol/responses";
+import type { RootState } from "../../protocol/state";
+
+export type SyncMessage = {
+  state: RootState;
+  serverStartTimeInLocalTime: number;
+};
 
 export const useServer = () => {
   const { setUserId } = useUserId();
@@ -18,7 +24,7 @@ export const useServer = () => {
     );
 
     socket.onmessage = (event) => {
-      console.log(`received: ${event.data}`);
+      // console.log(`received: ${event.data}`);
       try {
         const action: Responses = JSON.parse(event.data);
         if (action.type === "response:sync") {

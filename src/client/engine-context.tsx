@@ -2,14 +2,16 @@ import { createContext, useEffect, useRef, useState } from "react";
 import { initialState } from "../engine/reducers/root-reducer.ts";
 import { type Actions } from "../protocol/actions.ts";
 import { useServerContext } from "./hooks/use-server-context.ts";
-import type { RootState, State } from "../protocol/state.ts";
+import type { RootState } from "../protocol/state.ts";
 import { createTick } from "../engine/engine.ts";
 import hash from "object-hash";
+import { SyncMessage } from "./hooks/use-server.ts";
 
 export const EngineContext = createContext<{
-  state: State;
+  rootState: RootState;
   serverStartTime: number;
-}>(null as unknown as { state: State; serverStartTime: number });
+}>(null as unknown as { rootState: RootState; serverStartTime: number });
+
 export const EngineDispatchContext = createContext<(action: Actions) => void>(
   () => {}
 );
@@ -19,14 +21,16 @@ export const EngineContextProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
+  console.log("engine context provider");
   const serverStartTimeRef = useRef(0);
   const eventEmitter = useServerContext();
-  const [state, setState] = useState<State>(initialState.state);
+  const [rootState, setRootState] = useState<RootState>(initialState);
   const isSyncedRef = useRef(false);
+  const isRunningRef = useRef(false);
 
   useEffect(() => {
-    eventEmitter.on("sync", (action) => {
-      setState(action.state);
+    eventEmitter.on("sync", (action: SyncMessage) => {
+      setRootState(action.state);
       isSyncedRef.current = true;
       serverStartTimeRef.current = action.serverStartTimeInLocalTime;
     });
@@ -43,27 +47,41 @@ export const EngineContextProvider = ({
       ...initialState,
       hash: hash(initialState, { algorithm: "md5" }),
     };
+
+    isRunningRef.current = true;
+
     const invokeTick = () => {
+      if (!isRunningRef.current) {
+        console.log("not running");
+        return;
+      }
       if (!isSyncedRef.current) {
-        setTimeout(invokeTick, 100);
+        console.log("not synced yet");
+        setTimeout(invokeTick, rootState.state.tickDurationMs);
         return;
       }
       if (tick === null) {
         tick = createTick(new Date(serverStartTimeRef.current), undefined);
       }
       const { timeToProcess, state: newRootState } = tick!(rootState, []);
-      console.log(rootState.tick, rootState.hash);
-      setState(newRootState.state);
+      console.log(Date.now(), rootState.tick, rootState.hash);
+      setRootState(newRootState);
       rootState = newRootState;
       setTimeout(invokeTick, timeToProcess);
     };
 
-    setTimeout(invokeTick, 100);
+    console.log("starting tick");
+    setTimeout(invokeTick, rootState.state.tickDurationMs);
+
+    return () => {
+      console.log("stopping tick");
+      isRunningRef.current = false;
+    };
   }, []);
 
   return (
     <EngineContext.Provider
-      value={{ state, serverStartTime: serverStartTimeRef.current }}
+      value={{ rootState, serverStartTime: serverStartTimeRef.current }}
     >
       <EngineDispatchContext.Provider value={() => {}}>
         {children}

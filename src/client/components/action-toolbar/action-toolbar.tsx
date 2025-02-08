@@ -5,10 +5,10 @@ import { useUserId } from "../../hooks/use-user-id";
 import { Action } from "./action";
 
 export function ActionToolbar() {
-  const { state } = useContext(EngineContext);
+  const { rootState } = useContext(EngineContext);
   const { userId } = useUserId();
 
-  const currentUnit = state.units.find((unit) => unit.id === userId);
+  const currentUnit = rootState.state.units.find((unit) => unit.id === userId);
 
   const actions = currentUnit?.actions || [];
 

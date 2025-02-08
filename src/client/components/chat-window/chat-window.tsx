@@ -70,7 +70,7 @@ export function ChatWindow() {
   });
 
   const eventEmitter = useServerContext();
-  const { state } = useContext(EngineContext);
+  const { rootState } = useContext(EngineContext);
   const [actions, setActions] = useState<Responses[]>([]);
   const messagesRef = useRef<HTMLDivElement | null>(null);
 
@@ -159,13 +159,13 @@ export function ChatWindow() {
                         ta="left"
                         style={{
                           color:
-                            state.units.find(
+                            rootState.state.units.find(
                               (unit) => unit.id === message.payload.userId
                             )?.color ?? "black",
                         }}
                       >
                         {`${
-                          state.units.find(
+                          rootState.state.units.find(
                             (unit) => unit.id === message.payload.userId
                           )?.name ?? "Unknown"
                         }: ${message.payload.message}`}
@@ -212,7 +212,7 @@ export function ChatWindow() {
               <ScrollArea w={"100%"} h={"100%"} scrollbars="y" p={10}>
                 <Text ta="left" fz="xs" lh="xs" component="pre">
                   {JSON.stringify(
-                    JSONPath({ path: jsonPath, json: state }),
+                    JSONPath({ path: jsonPath, json: rootState }),
                     null,
                     2
                   )}

@@ -8,7 +8,7 @@ export const initialState: RootState = {
   tick: 0,
   hash: "",
   state: {
-    tickDurationMs: 100,
+    tickDurationMs: 1000,
     units: [],
   },
 };

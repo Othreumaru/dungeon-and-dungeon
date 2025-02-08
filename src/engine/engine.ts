@@ -1,7 +1,7 @@
 import EventEmitter from "eventemitter3";
 import type { Actions, FrameTickAction } from "../protocol/actions.ts";
 import { initialState, rootReducer } from "./reducers/root-reducer.ts";
-import type { RootState, State } from "../protocol/state.ts";
+import type { RootState } from "../protocol/state.ts";
 import { createFrameTickAction } from "../protocol/actions.ts";
 import hash from "object-hash";
 
@@ -15,19 +15,24 @@ export type EngineApi = {
   onTick: (
     callback: (arg: {
       timestamp: Date;
-      state: State;
+      state: RootState;
       action: FrameTickAction;
     }) => void
   ) => void;
   offTick: (callback: () => void) => void;
 };
 
+export type TickFn = (
+  state: RootState,
+  actionQueue: Actions[]
+) => { state: RootState; timeToProcess: number };
+
 export const createTick = (
   serverStartTime: Date,
   eventEmitter?: EventEmitter
-) => {
+): TickFn => {
   let totalTimeProcessed = 0;
-  return (rootState: RootState, actionQueue: Actions[]) => {
+  return (rootState, actionQueue) => {
     const now = new Date();
     const prevTickTime = serverStartTime.getTime() + totalTimeProcessed;
     let timeToProcess = now.getTime() - prevTickTime;

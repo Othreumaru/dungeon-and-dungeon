@@ -16,7 +16,7 @@ import { requestLeaveHandler } from "./handlers/request-leave-handler.ts";
 import { ClientRequests } from "../protocol/requests.ts";
 import { createSyncResponse } from "../protocol/responses.ts";
 import type { Responses } from "../protocol/responses.ts";
-import fs from "node:fs";
+import fs from "node:fs/promises";
 
 type UpgradedWebSocket = WebSocket & PlayerContext;
 
@@ -35,10 +35,8 @@ const log = (message: string) => {
   console.log(`${timestamp}: ${message}`);
 };
 
-export const initServer = (engineApi: EngineApi) => {
-  fs.truncate(LOG_FILE, 0, function () {
-    console.log(`clearing ${LOG_FILE} done`);
-  });
+export const initServer = async (engineApi: EngineApi) => {
+  await fs.truncate(LOG_FILE, 0);
   const app = express();
   app.set("trust proxy", true);
   app.use(express.static("dist"));
@@ -100,20 +98,13 @@ export const initServer = (engineApi: EngineApi) => {
     sync,
   };
 
-  engineApi.onTick(({ timestamp, action, state }) => {
-    // console.log(`tick ${state.tick} ${state.hash}`);
+  engineApi.onTick(({ timestamp, action }) => {
     fs.appendFile(
       LOG_FILE,
       `${JSON.stringify({
         timestamp: timestamp.toISOString(),
         action,
-        state,
-      })}\n`,
-      function (err) {
-        if (err) {
-          throw err;
-        }
-      }
+      })}\n`
     );
   });
 
