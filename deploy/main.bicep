@@ -24,7 +24,7 @@ param linuxFxVersion string = 'DOCKER|${image}' // The runtime stack of web app
 var appServicePlanName = toLower('dungeon-and-dungeon-plan-${webAppName}')
 var webSiteName = toLower('dungeon-and-dungeon-${webAppName}')
 
-resource appServicePlan 'Microsoft.Web/serverfarms@2024-04-01' = {
+resource appServicePlan 'Microsoft.Web/serverfarms@2024-11-01' = {
   name: appServicePlanName
   location: location
   properties: {
