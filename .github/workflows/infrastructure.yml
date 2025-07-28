@@ -20,7 +20,7 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       - name: Prod Infrastructure Deployment
-        uses: azure/bicep-deploy@b9a4cc4eedfcb883a766e9f9242b2eb274d28e7a # v1
+        uses: azure/bicep-deploy@4d5dc29bf04d05546dd5df9c665c54b9c5213207 # v2
         with:
           type: deploymentStack
           operation: create
